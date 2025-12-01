@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Դասընթացների փաթեթի արժեքի հաշվիչ - Dimordi</title>
+    <title>Դասընթացների փաթեթի արժեքի հաշվիչ</title>
     <style>
+    /* ===== RESET & BASE STYLES ===== */
     * {
         box-sizing: border-box;
         margin: 0;
@@ -16,49 +17,54 @@
         background-color: #f8f9fa;
         color: #333;
         line-height: 1.6;
-        padding: 15px; /* Changed from 20px */
+        padding: 15px;
     }
 
+    /* ===== CALCULATOR PAGE CONTAINER ===== */
     .course-calculator-page {
         max-width: 900px;
-        margin: 15px auto; /* Changed from 20px */
-        padding: 15px 20px; /* Changed from 20px */
+        margin: 15px auto;
+        padding: 15px 20px;
         background: white;
         border-radius: 18px;
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-        min-height: auto; /* IMPORTANT: Changed from 900px */
+        min-height: auto;
     }
 
+    /* ===== HEADER ===== */
     .calculator-header {
         text-align: center;
-        margin-bottom: 30px; /* Changed from 40px */
+        margin-bottom: 30px;
     }
 
     .calculator-header h1 {
-        font-size: 2.3rem;
-        margin-bottom: 12px; /* Changed from 15px */
+        font-size: 2rem; /* 32px - Your standard size */
+        margin-bottom: 12px;
         color: #1a365d;
         background: linear-gradient(135deg, #1a365d 0%, #2d6bcc 100%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
+        line-height: 1.2;
     }
 
     .calculator-header p {
         color: #666;
-        font-size: 1.15rem;
+        font-size: 1.125rem; /* 18px - Your standard size */
         max-width: 750px;
         margin: 0 auto;
+        line-height: 1.5;
     }
 
+    /* ===== DROPDOWN SELECTOR ===== */
     .custom-select {
         position: relative;
-        max-width: 100%; /* IMPORTANT: Changed from 700px */
-        margin: 25px auto; /* Changed from 30px */
+        max-width: 100%;
+        margin: 25px auto;
     }
 
     .select-header {
-        padding: 14px 18px; /* Changed from 16px 20px */
+        padding: 14px 18px;
         border: 2px solid #e2e8f0;
         border-radius: 12px;
         cursor: pointer;
@@ -66,7 +72,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 1.1rem;
+        font-size: 1.0625rem; /* 17px - Your standard size */
         color: #4a5568;
         transition: all 0.25s ease;
     }
@@ -92,21 +98,22 @@
         overflow: hidden;
     }
 
+    /* ===== CONFIRM BUTTON INSIDE DROPDOWN ===== */
     .confirm-button-container {
-        padding: 12px; /* Changed from 15px */
+        padding: 12px;
         border-bottom: 2px solid #f7fafc;
         text-align: right;
         background: #f8fafc;
     }
 
     .confirm-selection-btn {
-        padding: 10px 24px; /* Changed from 10px 28px */
+        padding: 10px 24px;
         background: #4299e1;
         color: white;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 1rem;
+        font-size: 1rem; /* 16px */
         font-weight: 600;
         transition: all 0.3s;
     }
@@ -122,6 +129,7 @@
         cursor: not-allowed;
     }
 
+    /* ===== COURSE OPTIONS LIST ===== */
     .courses-list {
         max-height: 300px;
         overflow-y: auto;
@@ -130,7 +138,7 @@
     .option-item {
         display: flex;
         align-items: center;
-        padding: 14px 18px; /* Changed from 16px 20px */
+        padding: 14px 18px;
         cursor: pointer;
         border-bottom: 1px solid #f1f5f9;
         transition: background-color 0.2s;
@@ -141,7 +149,7 @@
     }
 
     .option-item input[type="checkbox"] {
-        margin-right: 12px; /* Changed from 15px */
+        margin-right: 12px;
         width: 20px;
         height: 20px;
         accent-color: #4299e1;
@@ -156,31 +164,33 @@
         font-weight: 600;
         color: #2d3748;
         margin-bottom: 4px;
+        font-size: 1.3125rem; /* 21px - Your standard size */
     }
 
     .course-price {
         color: #718096;
-        font-size: 0.95rem;
+        font-size: 1rem; /* 16px - Your standard size */
     }
 
+    /* ===== SELECTED COURSES DISPLAY ===== */
     #selectedCoursesContainer {
-        margin: 30px 0; /* Changed from 40px */
+        margin: 30px 0;
         display: none;
     }
 
     .selected-courses-title {
         text-align: center;
-        margin-bottom: 20px; /* Changed from 25px */
+        margin-bottom: 20px;
         color: #2d3748;
-        font-size: 1.4rem;
+        font-size: 1.3125rem; /* 21px - Your standard size */
     }
 
     .selected-course-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px 20px; /* Changed from 18px 25px */
-        margin: 10px 0; /* Changed from 12px */
+        padding: 15px 20px;
+        margin: 10px 0;
         background: linear-gradient(90deg, #f0f9ff, #ffffff);
         border-radius: 12px;
         border-left: 5px solid #4299e1;
@@ -197,7 +207,7 @@
         color: white;
         border: none;
         border-radius: 6px;
-        padding: 7px 15px; /* Changed from 8px 18px */
+        padding: 7px 15px;
         cursor: pointer;
         font-size: 0.9rem;
         font-weight: 500;
@@ -208,10 +218,11 @@
         background: #f56565;
     }
 
+    /* ===== PROMO CODE SECTION ===== */
     .promo-section {
-        max-width: 100%; /* IMPORTANT: Changed from 600px */
-        margin: 30px auto; /* Changed from 40px */
-        padding: 20px; /* Changed from 30px */
+        max-width: 100%;
+        margin: 30px auto;
+        padding: 20px;
         background: #f8fafc;
         border-radius: 15px;
         border: 2px solid #e2e8f0;
@@ -219,23 +230,23 @@
 
     .promo-title {
         text-align: center;
-        margin-bottom: 20px; /* Changed from 25px */
+        margin-bottom: 20px;
         color: #2d3748;
-        font-size: 1.4rem;
+        font-size: 1.3125rem; /* 21px - Your standard size */
     }
 
     .promo-input-wrapper {
         display: flex;
-        gap: 12px; /* Changed from 15px */
+        gap: 12px;
         align-items: center;
     }
 
     .promo-input {
         flex: 1;
-        padding: 14px 18px; /* Changed from 16px 20px */
+        padding: 14px 18px;
         border: 2px solid #e2e8f0;
         border-radius: 10px;
-        font-size: 1.05rem;
+        font-size: 1.0625rem; /* 17px - Your standard size */
         transition: all 0.3s;
         text-align: center;
         color: #4a5568;
@@ -252,13 +263,13 @@
     }
 
     .apply-promo-btn {
-        padding: 14px 25px; /* Changed from 16px 30px */
+        padding: 14px 25px;
         background: #4299e1;
         color: white;
         border: none;
         border-radius: 10px;
         cursor: pointer;
-        font-size: 1.05rem;
+        font-size: 1.0625rem; /* 17px - Your standard size */
         font-weight: 600;
         transition: all 0.3s;
         white-space: nowrap;
@@ -277,26 +288,28 @@
 
     #promoMessage {
         text-align: center;
-        margin-top: 12px; /* Changed from 15px */
+        margin-top: 12px;
         min-height: 24px;
-        font-size: 0.95rem;
+        font-size: 1rem; /* 16px */
         padding: 5px;
     }
 
+    /* ===== RESULTS SECTION ===== */
     .results-container {
         background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
         border-left: 6px solid #38b2ac;
-        padding: 25px; /* Changed from 35px */
+        padding: 25px;
         border-radius: 16px;
-        margin-top: 30px; /* Changed from 40px */
+        margin-top: 30px;
         text-align: center;
     }
 
     .total-amount {
-        font-size: 2.5rem;
+        font-size: 2rem; /* 32px - Your standard size */
         font-weight: 800;
         color: #234e52;
-        margin-bottom: 12px; /* Changed from 15px */
+        margin-bottom: 12px;
+        line-height: 1.2;
     }
 
     #totalAmount {
@@ -305,37 +318,39 @@
     }
 
     .course-count {
-        font-size: 1.3rem;
+        font-size: 1.3125rem; /* 21px - Your standard size */
         color: #4a5568;
-        margin-bottom: 15px; /* Changed from 20px */
+        margin-bottom: 15px;
     }
 
     .discount-info {
-        font-size: 1.1rem;
+        font-size: 1.125rem; /* 18px - Your standard size */
         color: #4a5568;
         line-height: 1.7;
         background: rgba(255, 255, 255, 0.7);
-        padding: 15px; /* Changed from 20px */
+        padding: 15px;
         border-radius: 10px;
-        margin-top: 15px; /* Changed from 20px */
+        margin-top: 15px;
     }
 
+    /* ===== FOOTER NOTE ===== */
     .footer-note {
         text-align: center;
-        margin-top: 40px; /* Changed from 50px */
+        margin-top: 40px;
         color: #a0aec0;
-        font-size: 0.95rem;
-        padding-top: 15px; /* Changed from 20px */
+        font-size: 1rem; /* 16px */
+        padding-top: 15px;
         border-top: 1px solid #e2e8f0;
     }
 
+    /* ===== IMPROVED RESPONSIVE DESIGN ===== */
     @media (max-width: 768px) {
         body {
-            padding: 12px; /* Added for mobile */
+            padding: 12px;
         }
         
         .course-calculator-page {
-            max-width: 100% !important; /* IMPORTANT: Added !important */
+            max-width: 100% !important;
             padding: 15px !important;
             margin: 10px auto !important;
             border-radius: 15px !important;
@@ -343,13 +358,13 @@
         }
 
         .calculator-header h1 {
-            font-size: 1.8rem !important; /* More consistent scaling */
+            font-size: 1.6875rem !important; /* 27px - Your standard size */
             line-height: 1.3 !important;
             margin-bottom: 10px !important;
         }
 
         .calculator-header p {
-            font-size: 1rem !important;
+            font-size: 1.0625rem !important; /* 17px for mobile */
             line-height: 1.5 !important;
         }
 
@@ -363,7 +378,15 @@
 
         .select-header {
             padding: 12px 15px !important;
-            font-size: 1rem !important;
+            font-size: 1rem !important; /* 16px for mobile */
+        }
+
+        .course-name {
+            font-size: 1.125rem !important; /* 18px for mobile */
+        }
+
+        .course-price {
+            font-size: 0.9375rem !important; /* 15px for mobile */
         }
 
         .promo-input-wrapper {
@@ -373,13 +396,17 @@
 
         .promo-input, .apply-promo-btn {
             width: 100% !important;
-            font-size: 16px !important; /* Prevents iOS zoom */
+            font-size: 1rem !important; /* 16px - Prevents iOS zoom */
             padding: 12px 15px !important;
         }
 
         .total-amount {
-            font-size: 1.9rem !important;
+            font-size: 1.6875rem !important; /* 27px - Your standard size */
             line-height: 1.2 !important;
+        }
+
+        .course-count {
+            font-size: 1.125rem !important; /* 18px for mobile */
         }
 
         .selected-course-item {
@@ -405,7 +432,7 @@
         
         .discount-info {
             padding: 12px !important;
-            font-size: 1rem !important;
+            font-size: 1.0625rem !important; /* 17px for mobile */
         }
         
         .footer-note {
@@ -426,7 +453,11 @@
         }
 
         .calculator-header h1 {
-            font-size: 1.5rem !important;
+            font-size: 1.3125rem !important; /* 21px for small phones */
+        }
+
+        .calculator-header p {
+            font-size: 1rem !important; /* 16px for small phones */
         }
 
         .option-item {
@@ -434,16 +465,16 @@
         }
         
         .course-name {
-            font-size: 0.95rem !important;
+            font-size: 1.0625rem !important; /* 17px for small phones */
         }
         
         .course-price {
-            font-size: 0.85rem !important;
+            font-size: 0.875rem !important; /* 14px for small phones */
         }
 
         .confirm-selection-btn, .apply-promo-btn {
             padding: 12px 15px !important;
-            font-size: 0.95rem !important;
+            font-size: 1rem !important; /* 16px */
         }
         
         .selected-course-item {
@@ -455,11 +486,15 @@
         }
         
         .total-amount {
-            font-size: 1.6rem !important;
+            font-size: 1.3125rem !important; /* 21px for small phones */
         }
         
         .course-count {
-            font-size: 1.1rem !important;
+            font-size: 1.0625rem !important; /* 17px for small phones */
+        }
+        
+        .discount-info {
+            font-size: 1rem !important; /* 16px for small phones */
         }
     }
 </style>
@@ -895,5 +930,6 @@
 </body>
 
 </html>
+
 
 
