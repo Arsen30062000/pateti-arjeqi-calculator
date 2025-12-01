@@ -879,67 +879,67 @@ function applyPromoCode() {
     calculateTotal();
 }
 
-        function calculateTotal() {
-            const courseCount = selectedCourses.length;
-            
-            let total = selectedCourses.reduce((sum, course) => sum + course.price, 0);
-            
-            let quantityDiscount = 0;
-            let quantityDiscountText = '';
-            
-            if (courseCount > 3) {
-                quantityDiscount = total * 0.10;
-                quantityDiscountText = '10% զեղչ 3+ դասընթացի համար';
-            } else if (courseCount === 3) {
-                quantityDiscount = total * 0.07;
-                quantityDiscountText = '7% զեղչ 3 դասընթացի համար';
-            } else if (courseCount === 2) {
-                quantityDiscount = total * 0.05;
-                quantityDiscountText = '5% զեղչ 2 դասընթացի համար';
-            }
-            
-            let promoDiscount = 0;
-            if (currentPromoCode && VALID_PROMO_CODES[currentPromoCode]) {
-                promoDiscount = (total - quantityDiscount) * VALID_PROMO_CODES[currentPromoCode];
-            }
-            
-            const finalTotal = total - quantityDiscount - promoDiscount;
-            
-            totalAmountDisplay.textContent = finalTotal.toLocaleString('hy-AM');
-            courseCountText.textContent = courseCount > 0 
-                ? `Ընտրված է ${courseCount} դասընթաց` 
-                : 'Դեռևս դասընթաց չի ընտրվել';
-            
-            let discountHTML = '';
-            if (quantityDiscount > 0 || promoDiscount > 0) {
-                discountHTML = '<div style="text-align: left; max-width: 500px; margin: 0 auto;">';
-                
-                if (total > 0) {
-                    discountHTML += `<div style="margin-bottom: 8px;">Սկզբնական գինը՝ <strong>${total.toLocaleString('hy-AM')} դրամ</strong></div>`;
-                }
-                
-                if (quantityDiscount > 0) {
-                    discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">${quantityDiscountText}: <strong>-${quantityDiscount.toLocaleString('hy-AM')} դրամ</strong></div>`;
-                }
-                
-                if (promoDiscount > 0) {
-                    discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">10% լրացուցիչ զեղչ պրոմո կոդով: <strong>-${promoDiscount.toLocaleString('hy-AM')} դրամ</strong></div>`;
-                }
-                
-                const totalDiscount = quantityDiscount + promoDiscount;
-                const discountPercent = total > 0 ? Math.round((totalDiscount / total) * 100) : 0;
-                
-                discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; font-weight: bold; color: #234e52;">`;
-                discountHTML += `Ընդհանուր խնայողությունը՝ <strong>${totalDiscount.toLocaleString('hy-AM')} դրամ</strong> (${discountPercent}%)`;
-                discountHTML += `</div></div>`;
-            } else if (courseCount > 0) {
-                discountHTML = 'Զեղչեր չեն կիրառվել: Ընտրեք ավելի շատ դասընթացներ կամ մուտքագրեք պրոմո կոդ զեղչ ստանալու համար:';
-            } else {
-                discountHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար:';
-            }
-            
-            discountInfo.innerHTML = discountHTML;
+    function calculateTotal() {
+        const courseCount = selectedCourses.length;
+        
+        let total = selectedCourses.reduce((sum, course) => sum + course.price, 0);
+        
+        let quantityDiscount = 0;
+        let quantityDiscountText = '';
+        
+        if (courseCount > 3) {
+            quantityDiscount = total * 0.10;
+            quantityDiscountText = '10% զեղչ 3+ դասընթացի համար';
+        } else if (courseCount === 3) {
+            quantityDiscount = total * 0.07;
+            quantityDiscountText = '7% զեղչ 3 դասընթացի համար';
+        } else if (courseCount === 2) {
+            quantityDiscount = total * 0.05;
+            quantityDiscountText = '5% զեղչ 2 դասընթացի համար';
         }
+        
+        let promoDiscount = 0;
+        if (currentPromoCode && VALID_PROMO_CODES[currentPromoCode]) {
+            promoDiscount = (total - quantityDiscount) * VALID_PROMO_CODES[currentPromoCode];
+        }
+        
+        const finalTotal = total - quantityDiscount - promoDiscount;
+        
+        totalAmountDisplay.textContent = finalTotal.toLocaleString('hy-AM');
+        courseCountText.textContent = courseCount > 0 
+            ? `Ընտրված է ${courseCount} դասընթաց` 
+            : 'Դեռևս դասընթաց չի ընտրվել';
+        
+        let discountHTML = '';
+        if (quantityDiscount > 0 || promoDiscount > 0) {
+            discountHTML = '<div style="text-align: left; max-width: 500px; margin: 0 auto;">';
+            
+            if (total > 0) {
+                discountHTML += `<div style="margin-bottom: 8px;">Սկզբնական գինը՝ <span style="font-weight: 600;">${total.toLocaleString('hy-AM')} դրամ</span></div>`;
+            }
+            
+            if (quantityDiscount > 0) {
+                discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">${quantityDiscountText}: <span style="font-weight: 600;">-${quantityDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
+            }
+            
+            if (promoDiscount > 0) {
+                discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">10% լրացուցիչ զեղչ պրոմո կոդով: <span style="font-weight: 600;">-${promoDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
+            }
+            
+            const totalDiscount = quantityDiscount + promoDiscount;
+            const discountPercent = total > 0 ? Math.round((totalDiscount / total) * 100) : 0;
+            
+            discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; color: #234e52;">`;
+            discountHTML += `Ընդհանուր խնայողությունը՝ <span style="font-weight: 600;">${totalDiscount.toLocaleString('hy-AM')} դրամ</span> (${discountPercent}%)`;
+            discountHTML += `</div></div>`;
+        } else if (courseCount > 0) {
+            discountHTML = 'Զեղչեր չեն կիրառվել: Ընտրեք ավելի շատ դասընթացներ կամ մուտքագրեք պրոմո կոդ զեղչ ստանալու համար:';
+        } else {
+            discountHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար:';
+        }
+        
+        discountInfo.innerHTML = discountHTML;
+    }
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -952,6 +952,7 @@ function applyPromoCode() {
     </script>
 </body>
 </html>
+
 
 
 
