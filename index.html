@@ -824,34 +824,60 @@
             calculateTotal();
         }
 
-        function applyPromoCode() {
-            const promoCode = promoCodeInput.value.trim();
-            
-            if (promoCode === 'PROMO10') {
-                currentPromoCode = promoCode;
-                promoCodeInput.style.borderColor = '#38a169';
-                promoMessage.style.color = '#38a169';
-                promoMessage.innerHTML = '<strong>✓ Պրոմո կոդը հաստատված է:</strong> Դուք կստանաք լրացուցիչ 10% զեղչ:';
-                
-                applyPromoButton.style.background = '#38a169';
-                applyPromoButton.textContent = 'Կիրառված ✓';
-                setTimeout(() => {
-                    applyPromoButton.style.background = '#4299e1';
-                    applyPromoButton.textContent = 'Կիրառել կոդը';
-                }, 1500);
-            } else if (promoCode === '') {
+function applyPromoCode() {
+    const promoCode = promoCodeInput.value.trim();
+    
+    if (promoCode === 'PROMO10') {
+        currentPromoCode = promoCode;
+        promoCodeInput.style.borderColor = '#38a169';
+        promoMessage.style.color = '#38a169';
+        promoMessage.innerHTML = '<strong>✓ Պրոմո կոդը հաստատված է:</strong> Դուք կստանաք լրացուցիչ 10% զեղչ:';
+        
+        // Apply green color permanently for valid promo
+        applyPromoButton.style.background = '#38a169';
+        applyPromoButton.textContent = 'Կիրառված է ✓';
+        applyPromoButton.disabled = true; // Optional: disable button after applying
+        
+        // Only reset if user clears the promo code input
+        promoCodeInput.addEventListener('input', function onPromoInputChange() {
+            if (this.value.trim() !== currentPromoCode) {
+                // Reset promo state if user changes the input
                 currentPromoCode = '';
+                applyPromoButton.style.background = '#4299e1';
+                applyPromoButton.textContent = 'Կիրառել կոդը';
+                applyPromoButton.disabled = false;
                 promoCodeInput.style.borderColor = '#e2e8f0';
                 promoMessage.textContent = '';
-            } else {
-                currentPromoCode = '';
-                promoCodeInput.style.borderColor = '#fc8181';
-                promoMessage.style.color = '#c53030';
-                promoMessage.textContent = 'Պրոմո կոդը անվավեր է:';
+                
+                // Remove this event listener to avoid multiple bindings
+                this.removeEventListener('input', onPromoInputChange);
+                calculateTotal();
             }
-            
-            calculateTotal();
-        }
+        });
+        
+    } else if (promoCode === '') {
+        currentPromoCode = '';
+        promoCodeInput.style.borderColor = '#e2e8f0';
+        promoMessage.textContent = '';
+        applyPromoButton.style.background = '#4299e1';
+        applyPromoButton.textContent = 'Կիրառել կոդը';
+    } else {
+        currentPromoCode = '';
+        promoCodeInput.style.borderColor = '#fc8181';
+        promoMessage.style.color = '#c53030';
+        promoMessage.textContent = 'Պրոմո կոդը անվավեր է:';
+        
+        // Reset button after showing error (optional)
+        setTimeout(() => {
+            if (promoCodeInput.value.trim() !== 'PROMO10') {
+                applyPromoButton.style.background = '#4299e1';
+                applyPromoButton.textContent = 'Կիրառել կոդը';
+            }
+        }, 1500);
+    }
+    
+    calculateTotal();
+}
 
         function calculateTotal() {
             const courseCount = selectedCourses.length;
@@ -909,7 +935,7 @@
             } else if (courseCount > 0) {
                 discountHTML = 'Զեղչեր չեն կիրառվել: Ընտրեք ավելի շատ դասընթացներ կամ մուտքագրեք պրոմո կոդ զեղչ ստանալու համար:';
             } else {
-                discountHTML = 'Ընտրեք դասընթացները զեղչերի կիրառման համար:';
+                discountHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար:';
             }
             
             discountInfo.innerHTML = discountHTML;
@@ -926,3 +952,4 @@
     </script>
 </body>
 </html>
+
