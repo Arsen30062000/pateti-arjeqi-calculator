@@ -5,396 +5,464 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Դասընթացների փաթեթի արժեքի հաշվիչ - Dimordi</title>
     <style>
-        /* ===== RESET & BASE STYLES ===== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
 
+    body {
+        background-color: #f8f9fa;
+        color: #333;
+        line-height: 1.6;
+        padding: 15px; /* Changed from 20px */
+    }
+
+    .course-calculator-page {
+        max-width: 900px;
+        margin: 15px auto; /* Changed from 20px */
+        padding: 15px 20px; /* Changed from 20px */
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        min-height: auto; /* IMPORTANT: Changed from 900px */
+    }
+
+    .calculator-header {
+        text-align: center;
+        margin-bottom: 30px; /* Changed from 40px */
+    }
+
+    .calculator-header h1 {
+        font-size: 2.3rem;
+        margin-bottom: 12px; /* Changed from 15px */
+        color: #1a365d;
+        background: linear-gradient(135deg, #1a365d 0%, #2d6bcc 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .calculator-header p {
+        color: #666;
+        font-size: 1.15rem;
+        max-width: 750px;
+        margin: 0 auto;
+    }
+
+    .custom-select {
+        position: relative;
+        max-width: 100%; /* IMPORTANT: Changed from 700px */
+        margin: 25px auto; /* Changed from 30px */
+    }
+
+    .select-header {
+        padding: 14px 18px; /* Changed from 16px 20px */
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        cursor: pointer;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.1rem;
+        color: #4a5568;
+        transition: all 0.25s ease;
+    }
+
+    .select-header:hover {
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    }
+
+    .select-options {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        z-index: 1000;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-height: 400px;
+        overflow: hidden;
+    }
+
+    .confirm-button-container {
+        padding: 12px; /* Changed from 15px */
+        border-bottom: 2px solid #f7fafc;
+        text-align: right;
+        background: #f8fafc;
+    }
+
+    .confirm-selection-btn {
+        padding: 10px 24px; /* Changed from 10px 28px */
+        background: #4299e1;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .confirm-selection-btn:hover:not(:disabled) {
+        background: #3182ce;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+    }
+
+    .confirm-selection-btn:disabled {
+        background: #cbd5e0;
+        cursor: not-allowed;
+    }
+
+    .courses-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .option-item {
+        display: flex;
+        align-items: center;
+        padding: 14px 18px; /* Changed from 16px 20px */
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s;
+    }
+
+    .option-item:hover {
+        background-color: #f7fafc;
+    }
+
+    .option-item input[type="checkbox"] {
+        margin-right: 12px; /* Changed from 15px */
+        width: 20px;
+        height: 20px;
+        accent-color: #4299e1;
+        flex-shrink: 0;
+    }
+
+    .course-info {
+        flex-grow: 1;
+    }
+
+    .course-name {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 4px;
+    }
+
+    .course-price {
+        color: #718096;
+        font-size: 0.95rem;
+    }
+
+    #selectedCoursesContainer {
+        margin: 30px 0; /* Changed from 40px */
+        display: none;
+    }
+
+    .selected-courses-title {
+        text-align: center;
+        margin-bottom: 20px; /* Changed from 25px */
+        color: #2d3748;
+        font-size: 1.4rem;
+    }
+
+    .selected-course-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px; /* Changed from 18px 25px */
+        margin: 10px 0; /* Changed from 12px */
+        background: linear-gradient(90deg, #f0f9ff, #ffffff);
+        border-radius: 12px;
+        border-left: 5px solid #4299e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s;
+    }
+
+    .selected-course-item:hover {
+        transform: translateY(-3px);
+    }
+
+    .remove-course-btn {
+        background: #fc8181;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 7px 15px; /* Changed from 8px 18px */
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .remove-course-btn:hover {
+        background: #f56565;
+    }
+
+    .promo-section {
+        max-width: 100%; /* IMPORTANT: Changed from 600px */
+        margin: 30px auto; /* Changed from 40px */
+        padding: 20px; /* Changed from 30px */
+        background: #f8fafc;
+        border-radius: 15px;
+        border: 2px solid #e2e8f0;
+    }
+
+    .promo-title {
+        text-align: center;
+        margin-bottom: 20px; /* Changed from 25px */
+        color: #2d3748;
+        font-size: 1.4rem;
+    }
+
+    .promo-input-wrapper {
+        display: flex;
+        gap: 12px; /* Changed from 15px */
+        align-items: center;
+    }
+
+    .promo-input {
+        flex: 1;
+        padding: 14px 18px; /* Changed from 16px 20px */
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        transition: all 0.3s;
+        text-align: center;
+        color: #4a5568;
+    }
+
+    .promo-input:focus {
+        outline: none;
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+    }
+
+    .promo-input::placeholder {
+        color: #a0aec0;
+    }
+
+    .apply-promo-btn {
+        padding: 14px 25px; /* Changed from 16px 30px */
+        background: #4299e1;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1.05rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+    .apply-promo-btn:hover:not(:disabled) {
+        background: #3182ce;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(49, 130, 206, 0.3);
+    }
+
+    .apply-promo-btn:disabled {
+        background: #cbd5e0;
+        cursor: not-allowed;
+    }
+
+    #promoMessage {
+        text-align: center;
+        margin-top: 12px; /* Changed from 15px */
+        min-height: 24px;
+        font-size: 0.95rem;
+        padding: 5px;
+    }
+
+    .results-container {
+        background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
+        border-left: 6px solid #38b2ac;
+        padding: 25px; /* Changed from 35px */
+        border-radius: 16px;
+        margin-top: 30px; /* Changed from 40px */
+        text-align: center;
+    }
+
+    .total-amount {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #234e52;
+        margin-bottom: 12px; /* Changed from 15px */
+    }
+
+    #totalAmount {
+        color: #2c7a7b;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .course-count {
+        font-size: 1.3rem;
+        color: #4a5568;
+        margin-bottom: 15px; /* Changed from 20px */
+    }
+
+    .discount-info {
+        font-size: 1.1rem;
+        color: #4a5568;
+        line-height: 1.7;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 15px; /* Changed from 20px */
+        border-radius: 10px;
+        margin-top: 15px; /* Changed from 20px */
+    }
+
+    .footer-note {
+        text-align: center;
+        margin-top: 40px; /* Changed from 50px */
+        color: #a0aec0;
+        font-size: 0.95rem;
+        padding-top: 15px; /* Changed from 20px */
+        border-top: 1px solid #e2e8f0;
+    }
+
+    @media (max-width: 768px) {
         body {
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
+            padding: 12px; /* Added for mobile */
         }
-
-        /* ===== CALCULATOR PAGE CONTAINER ===== */
+        
         .course-calculator-page {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-            min-height: 900px;
-        }
-
-        /* ===== HEADER ===== */
-        .calculator-header {
-            text-align: center;
-            margin-bottom: 40px;
+            max-width: 100% !important; /* IMPORTANT: Added !important */
+            padding: 15px !important;
+            margin: 10px auto !important;
+            border-radius: 15px !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06) !important;
         }
 
         .calculator-header h1 {
-            font-size: 2.3rem;
-            margin-bottom: 15px;
-            color: #1a365d;
-            background: linear-gradient(135deg, #1a365d 0%, #2d6bcc 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 1.8rem !important; /* More consistent scaling */
+            line-height: 1.3 !important;
+            margin-bottom: 10px !important;
         }
 
         .calculator-header p {
-            color: #666;
-            font-size: 1.15rem;
-            max-width: 750px;
-            margin: 0 auto;
+            font-size: 1rem !important;
+            line-height: 1.5 !important;
         }
 
-        /* ===== DROPDOWN SELECTOR ===== */
+        .calculator-header {
+            margin-bottom: 25px !important;
+        }
+
         .custom-select {
-            position: relative;
-            max-width: 700px;
-            margin: 30px auto;
+            margin: 20px auto !important;
         }
 
         .select-header {
-            padding: 16px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            background: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.1rem;
-            color: #4a5568;
-            transition: all 0.25s ease;
-        }
-
-        .select-header:hover {
-            border-color: #4299e1;
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
-        }
-
-        .select-options {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-top: none;
-            border-radius: 0 0 12px 12px;
-            z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-height: 400px;
-            overflow: hidden;
-        }
-
-        /* ===== CONFIRM BUTTON INSIDE DROPDOWN ===== */
-        .confirm-button-container {
-            padding: 15px;
-            border-bottom: 2px solid #f7fafc;
-            text-align: right;
-            background: #f8fafc;
-        }
-
-        .confirm-selection-btn {
-            padding: 10px 28px;
-            background: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .confirm-selection-btn:hover:not(:disabled) {
-            background: #3182ce;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
-        }
-
-        .confirm-selection-btn:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-        }
-
-        /* ===== COURSE OPTIONS LIST ===== */
-        .courses-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .option-item {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
-            transition: background-color 0.2s;
-        }
-
-        .option-item:hover {
-            background-color: #f7fafc;
-        }
-
-        .option-item input[type="checkbox"] {
-            margin-right: 15px;
-            width: 20px;
-            height: 20px;
-            accent-color: #4299e1;
-            flex-shrink: 0;
-        }
-
-        .course-info {
-            flex-grow: 1;
-        }
-
-        .course-name {
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 4px;
-        }
-
-        .course-price {
-            color: #718096;
-            font-size: 0.95rem;
-        }
-
-        /* ===== SELECTED COURSES DISPLAY ===== */
-        #selectedCoursesContainer {
-            margin: 40px 0;
-            display: none;
-        }
-
-        .selected-courses-title {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #2d3748;
-            font-size: 1.4rem;
-        }
-
-        .selected-course-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 25px;
-            margin: 12px 0;
-            background: linear-gradient(90deg, #f0f9ff, #ffffff);
-            border-radius: 12px;
-            border-left: 5px solid #4299e1;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            transition: transform 0.2s;
-        }
-
-        .selected-course-item:hover {
-            transform: translateY(-3px);
-        }
-
-        .remove-course-btn {
-            background: #fc8181;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 18px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .remove-course-btn:hover {
-            background: #f56565;
-        }
-
-        /* ===== PROMO CODE SECTION ===== */
-        .promo-section {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 30px;
-            background: #f8fafc;
-            border-radius: 15px;
-            border: 2px solid #e2e8f0;
-        }
-
-        .promo-title {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #2d3748;
-            font-size: 1.4rem;
+            padding: 12px 15px !important;
+            font-size: 1rem !important;
         }
 
         .promo-input-wrapper {
-            display: flex;
-            gap: 15px;
-            align-items: center;
+            flex-direction: column !important;
+            gap: 10px !important;
         }
 
-        .promo-input {
-            flex: 1;
-            padding: 16px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1.05rem;
-            transition: all 0.3s;
-            text-align: center;
-            color: #4a5568;
-        }
-
-        .promo-input:focus {
-            outline: none;
-            border-color: #4299e1;
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
-        }
-
-        .promo-input::placeholder {
-            color: #a0aec0;
-        }
-
-        .apply-promo-btn {
-            padding: 16px 30px;
-            background: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.05rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .apply-promo-btn:hover:not(:disabled) {
-            background: #3182ce;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(49, 130, 206, 0.3);
-        }
-
-        .apply-promo-btn:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-        }
-
-        #promoMessage {
-            text-align: center;
-            margin-top: 15px;
-            min-height: 24px;
-            font-size: 0.95rem;
-            padding: 5px;
-        }
-
-        /* ===== RESULTS SECTION ===== */
-        .results-container {
-            background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
-            border-left: 6px solid #38b2ac;
-            padding: 35px;
-            border-radius: 16px;
-            margin-top: 40px;
-            text-align: center;
+        .promo-input, .apply-promo-btn {
+            width: 100% !important;
+            font-size: 16px !important; /* Prevents iOS zoom */
+            padding: 12px 15px !important;
         }
 
         .total-amount {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #234e52;
-            margin-bottom: 15px;
+            font-size: 1.9rem !important;
+            line-height: 1.2 !important;
         }
 
-        #totalAmount {
-            color: #2c7a7b;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .selected-course-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            padding: 15px !important;
         }
 
-        .course-count {
-            font-size: 1.3rem;
-            color: #4a5568;
-            margin-bottom: 20px;
+        .remove-course-btn {
+            align-self: flex-end !important;
+            margin-top: 5px !important;
         }
-
+        
+        .option-item {
+            padding: 12px 15px !important;
+        }
+        
+        .results-container {
+            padding: 20px 15px !important;
+            margin-top: 25px !important;
+        }
+        
         .discount-info {
-            font-size: 1.1rem;
-            color: #4a5568;
-            line-height: 1.7;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
+            padding: 12px !important;
+            font-size: 1rem !important;
         }
-
-        /* ===== FOOTER NOTE ===== */
+        
         .footer-note {
-            text-align: center;
-            margin-top: 50px;
-            color: #a0aec0;
-            font-size: 0.95rem;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            margin-top: 30px !important;
+            padding-top: 12px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        body {
+            padding: 10px !important;
+        }
+        
+        .course-calculator-page {
+            padding: 12px !important;
+            margin: 8px auto !important;
+            border-radius: 12px !important;
         }
 
-        /* ===== RESPONSIVE DESIGN ===== */
-        @media (max-width: 768px) {
-            .course-calculator-page {
-                padding: 20px;
-                margin: 15px;
-            }
-
-            .calculator-header h1 {
-                font-size: 1.9rem;
-            }
-
-            .calculator-header p {
-                font-size: 1rem;
-            }
-
-            .promo-input-wrapper {
-                flex-direction: column;
-            }
-
-            .promo-input, .apply-promo-btn {
-                width: 100%;
-            }
-
-            .total-amount {
-                font-size: 2rem;
-            }
-
-            .selected-course-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .remove-course-btn {
-                align-self: flex-end;
-            }
+        .calculator-header h1 {
+            font-size: 1.5rem !important;
         }
 
-        @media (max-width: 480px) {
-            .calculator-header h1 {
-                font-size: 1.6rem;
-            }
-
-            .option-item {
-                padding: 14px;
-            }
-
-            .confirm-selection-btn, .apply-promo-btn {
-                padding: 14px 20px;
-            }
-
-            .results-container {
-                padding: 25px 20px;
-            }
+        .option-item {
+            padding: 10px 12px !important;
         }
-    </style>
+        
+        .course-name {
+            font-size: 0.95rem !important;
+        }
+        
+        .course-price {
+            font-size: 0.85rem !important;
+        }
+
+        .confirm-selection-btn, .apply-promo-btn {
+            padding: 12px 15px !important;
+            font-size: 0.95rem !important;
+        }
+        
+        .selected-course-item {
+            padding: 12px !important;
+        }
+        
+        .results-container {
+            padding: 18px 12px !important;
+        }
+        
+        .total-amount {
+            font-size: 1.6rem !important;
+        }
+        
+        .course-count {
+            font-size: 1.1rem !important;
+        }
+    }
+</style>
 </head>
 <body>
     <section id="course-calculator" class="course-calculator-page">
@@ -827,4 +895,5 @@
 </body>
 
 </html>
+
 
