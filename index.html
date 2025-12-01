@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Դասընթացների փաթեթի արժեքի հաշվիչ - Dimordi</title>
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* ===== CALCULATOR PAGE CONTAINER ===== */
+        .course-calculator-page {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ===== HEADER ===== */
+        .calculator-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .calculator-header h1 {
+            font-size: 2.3rem;
+            margin-bottom: 15px;
+            color: #1a365d;
+            background: linear-gradient(135deg, #1a365d 0%, #2d6bcc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .calculator-header p {
+            color: #666;
+            font-size: 1.15rem;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        /* ===== DROPDOWN SELECTOR ===== */
+        .custom-select {
+            position: relative;
+            max-width: 700px;
+            margin: 30px auto;
+        }
+
+        .select-header {
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #4a5568;
+            transition: all 0.25s ease;
+        }
+
+        .select-header:hover {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+
+        .select-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            z-index: 1000;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow: hidden;
+        }
+
+        /* ===== CONFIRM BUTTON INSIDE DROPDOWN ===== */
+        .confirm-button-container {
+            padding: 15px;
+            border-bottom: 2px solid #f7fafc;
+            text-align: right;
+            background: #f8fafc;
+        }
+
+        .confirm-selection-btn {
+            padding: 10px 28px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .confirm-selection-btn:hover:not(:disabled) {
+            background: #3182ce;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+        }
+
+        .confirm-selection-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        /* ===== COURSE OPTIONS LIST ===== */
+        .courses-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s;
+        }
+
+        .option-item:hover {
+            background-color: #f7fafc;
+        }
+
+        .option-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: #4299e1;
+            flex-shrink: 0;
+        }
+
+        .course-info {
+            flex-grow: 1;
+        }
+
+        .course-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .course-price {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        /* ===== SELECTED COURSES DISPLAY ===== */
+        #selectedCoursesContainer {
+            margin: 40px 0;
+            display: none;
+        }
+
+        .selected-courses-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2d3748;
+            font-size: 1.4rem;
+        }
+
+        .selected-course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 25px;
+            margin: 12px 0;
+            background: linear-gradient(90deg, #f0f9ff, #ffffff);
+            border-radius: 12px;
+            border-left: 5px solid #4299e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .selected-course-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .remove-course-btn {
+            background: #fc8181;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .remove-course-btn:hover {
+            background: #f56565;
+        }
+
+        /* ===== PROMO CODE SECTION ===== */
+        .promo-section {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .promo-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2d3748;
+            font-size: 1.4rem;
+        }
+
+        .promo-input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .promo-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            text-align: center;
+            color: #4a5568;
+        }
+
+        .promo-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        .promo-input::placeholder {
+            color: #a0aec0;
+        }
+
+        .apply-promo-btn {
+            padding: 16px 30px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .apply-promo-btn:hover:not(:disabled) {
+            background: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(49, 130, 206, 0.3);
+        }
+
+        .apply-promo-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        #promoMessage {
+            text-align: center;
+            margin-top: 15px;
+            min-height: 24px;
+            font-size: 0.95rem;
+            padding: 5px;
+        }
+
+        /* ===== RESULTS SECTION ===== */
+        .results-container {
+            background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
+            border-left: 6px solid #38b2ac;
+            padding: 35px;
+            border-radius: 16px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #234e52;
+            margin-bottom: 15px;
+        }
+
+        #totalAmount {
+            color: #2c7a7b;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-count {
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .discount-info {
+            font-size: 1.1rem;
+            color: #4a5568;
+            line-height: 1.7;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        /* ===== FOOTER NOTE ===== */
+        .footer-note {
+            text-align: center;
+            margin-top: 50px;
+            color: #a0aec0;
+            font-size: 0.95rem;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .course-calculator-page {
+                padding: 20px;
+                margin: 15px;
+            }
+
+            .calculator-header h1 {
+                font-size: 1.9rem;
+            }
+
+            .calculator-header p {
+                font-size: 1rem;
+            }
+
+            .promo-input-wrapper {
+                flex-direction: column;
+            }
+
+            .promo-input, .apply-promo-btn {
+                width: 100%;
+            }
+
+            .total-amount {
+                font-size: 2rem;
+            }
+
+            .selected-course-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .remove-course-btn {
+                align-self: flex-end;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calculator-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .option-item {
+                padding: 14px;
+            }
+
+            .confirm-selection-btn, .apply-promo-btn {
+                padding: 14px 20px;
+            }
+
+            .results-container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section id="course-calculator" class="course-calculator-page">
+        <div class="calculator-header">
+            <h1>Դասընթացների փաթեթի արժեքի հաշվիչ</h1>
+            <p>Ընտրեք դասընթացները, կիրառեք զեղչերը և տեսեք ձեր խնայողությունները փաթեթային գնման դեպքում</p>
+        </div>
+
+        <!-- Course Selection Dropdown -->
+        <div class="custom-select">
+            <div class="select-header" id="dropdownTrigger">
+                <span id="selectPlaceholder">Ընտրեք դասընթացները...</span>
+                <span style="color: #718096;">▼</span>
+            </div>
+            
+            <div class="select-options" id="coursesDropdown">
+                <!-- Confirmation Button -->
+                <div class="confirm-button-container">
+                    <button id="confirmButton" class="confirm-selection-btn" disabled>
+                        Հաստատել ընտրությունը
+                    </button>
+                </div>
+                
+                <!-- Courses List -->
+                <div class="courses-list">
+                    <!-- Course 1 -->
+                    <label class="option-item" data-course-id="course1">
+                        <input type="checkbox" value="course1">
+                        <div class="course-info">
+                            <div class="course-name">Շտեմարան 1, գլուխ 1</div>
+                            <div class="course-price">2,900 AMD</div>
+                        </div>
+                    </label>
+                    
+                    <!-- Course 2 -->
+                    <label class="option-item" data-course-id="course2">
+                        <input type="checkbox" value="course2">
+                        <div class="course-info">
+                            <div class="course-name">Շտեմարան 2, գլուխ 1</div>
+                            <div class="course-price">7,900 AMD</div>
+                        </div>
+                    </label>
+                    
+                    <!-- Course 3 -->
+                    <label class="option-item" data-course-id="course3">
+                        <input type="checkbox" value="course3">
+                        <div class="course-info">
+                            <div class="course-name">Շտեմարան 1, գլուխ 2</div>
+                            <div class="course-price">17,900 AMD</div>
+                        </div>
+                    </label>
+                    
+                    <!-- Course 4 -->
+                    <label class="option-item" data-course-id="course4">
+                        <input type="checkbox" value="course4">
+                        <div class="course-info">
+                            <div class="course-name">Շտեմարան 2, գլուխ 2</div>
+                            <div class="course-price">29,900 AMD</div>
+                        </div>
+                    </label>
+                    
+                    <!-- Course 5 -->
+                    <label class="option-item" data-course-id="course5">
+                        <input type="checkbox" value="course5">
+                        <div class="course-info">
+                            <div class="course-name">Շտեմարան 1, գլուխ 3</div>
+                            <div class="course-price">3,900 AMD</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Courses Display -->
+        <div id="selectedCoursesContainer">
+            <h3 class="selected-courses-title">Ընտրված դասընթացները</h3>
+            <div id="selectedCoursesList">
+                <!-- Selected courses will appear here dynamically -->
+            </div>
+        </div>
+
+        <!-- Promo Code Section -->
+        <div class="promo-section">
+            <h3 class="promo-title">Պրոմո կոդ (եթե ունեք)</h3>
+            <div class="promo-input-wrapper">
+                <input type="text" id="promoCode" class="promo-input" placeholder="Մուտքագրեք պրոմո կոդը (օր. PROMO10)">
+                <button id="applyPromoButton" class="apply-promo-btn" disabled>
+                    Կիրառել կոդը
+                </button>
+            </div>
+            <div id="promoMessage"></div>
+        </div>
+
+        <!-- Results -->
+        <div id="result" class="results-container">
+            <div class="total-amount">
+                Ընդհանուր արժեքը՝ <span id="totalAmount">0</span> AMD
+            </div>
+            <div id="courseCountText" class="course-count"></div>
+            <div id="discountInfo" class="discount-info"></div>
+        </div>
+
+        <div class="footer-note">
+            <p>Հաշվիչը ստեղծված է հատուկ Dimordi կայքի համար</p>
+        </div>
+    </section>
+
+    <script>
+        // ==================== COURSE DATA ====================
+        const courses = {
+            course1: { name: 'Շտեմարան 1, գլուխ 1', price: 2900 },
+            course2: { name: 'Շտեմարան 2, գլուխ 1', price: 7900 },
+            course3: { name: 'Շտեմարան 1, գլուխ 2', price: 17900 },
+            course4: { name: 'Շտեմարան 2, գլուխ 2', price: 29900 },
+            course5: { name: 'Շտեմարան 1, գլուխ 3', price: 3900 }
+        };
+
+        // ==================== APPLICATION STATE ====================
+        let selectedCourses = [];
+        let currentPromoCode = '';
+        const VALID_PROMO_CODES = { 'PROMO10': 0.10 }; // 10% discount
+
+        // ==================== DOM ELEMENTS ====================
+        const dropdownTrigger = document.getElementById('dropdownTrigger');
+        const coursesDropdown = document.getElementById('coursesDropdown');
+        const selectPlaceholder = document.getElementById('selectPlaceholder');
+        const confirmButton = document.getElementById('confirmButton');
+        const selectedCoursesContainer = document.getElementById('selectedCoursesContainer');
+        const selectedCoursesList = document.getElementById('selectedCoursesList');
+        const promoCodeInput = document.getElementById('promoCode');
+        const applyPromoButton = document.getElementById('applyPromoButton');
+        const promoMessage = document.getElementById('promoMessage');
+        const totalAmountDisplay = document.getElementById('totalAmount');
+        const courseCountText = document.getElementById('courseCountText');
+        const discountInfo = document.getElementById('discountInfo');
+
+        // ==================== DROPDOWN FUNCTIONS ====================
+        dropdownTrigger.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const isVisible = coursesDropdown.style.display === 'block';
+            coursesDropdown.style.display = isVisible ? 'none' : 'block';
+            
+            // Add visual feedback
+            if (!isVisible) {
+                dropdownTrigger.style.borderColor = '#4299e1';
+                dropdownTrigger.style.boxShadow = '0 0 0 3px rgba(66, 153, 225, 0.2)';
+            } else {
+                dropdownTrigger.style.borderColor = '#e2e8f0';
+                dropdownTrigger.style.boxShadow = 'none';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.custom-select')) {
+                coursesDropdown.style.display = 'none';
+                dropdownTrigger.style.borderColor = '#e2e8f0';
+                dropdownTrigger.style.boxShadow = 'none';
+            }
+        });
+
+        // ==================== CHECKBOX & BUTTON UPDATES ====================
+        function updateConfirmButton() {
+            const checkboxes = document.querySelectorAll('.select-options input[type="checkbox"]');
+            let anyChecked = false;
+            
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) anyChecked = true;
+            });
+            
+            if (anyChecked) {
+                confirmButton.style.background = '#4299e1';
+                confirmButton.disabled = false;
+            } else {
+                confirmButton.style.background = '#cbd5e0';
+                confirmButton.disabled = true;
+            }
+        }
+
+        function updatePromoButton() {
+            const promoCode = promoCodeInput.value.trim();
+            
+            if (promoCode.length > 0) {
+                applyPromoButton.style.background = '#4299e1';
+                applyPromoButton.disabled = false;
+            } else {
+                applyPromoButton.style.background = '#cbd5e0';
+                applyPromoButton.disabled = true;
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        // Checkbox changes
+        document.querySelectorAll('.select-options input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateConfirmButton);
+        });
+
+        // Confirm button
+        confirmButton.addEventListener('click', function() {
+            // Visual feedback
+            this.style.background = '#38a169';
+            this.textContent = 'Հաստատված ✓';
+            
+            setTimeout(() => {
+                this.style.background = '#4299e1';
+                this.textContent = 'Հաստատել ընտրությունը';
+            }, 1000);
+            
+            // Process selection
+            processCourseSelection();
+        });
+
+        // Promo code input
+        promoCodeInput.addEventListener('input', function() {
+            updatePromoButton();
+            if (this.value.trim() !== currentPromoCode) {
+                this.style.borderColor = '#e2e8f0';
+                promoMessage.textContent = '';
+            }
+        });
+
+        // Enter key in promo field
+        promoCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !applyPromoButton.disabled) {
+                applyPromoCode();
+            }
+        });
+
+        // Apply promo button
+        applyPromoButton.addEventListener('click', applyPromoCode);
+
+        // ==================== CORE LOGIC FUNCTIONS ====================
+        function processCourseSelection() {
+            const checkboxes = document.querySelectorAll('.select-options input[type="checkbox"]');
+            selectedCourses = [];
+            
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const courseId = checkbox.value;
+                    selectedCourses.push({
+                        id: courseId,
+                        name: courses[courseId].name,
+                        price: courses[courseId].price
+                    });
+                }
+            });
+            
+            // Update placeholder
+            if (selectedCourses.length > 0) {
+                selectPlaceholder.textContent = `Ընտրված է ${selectedCourses.length} դասընթաց`;
+                selectPlaceholder.style.color = '#2d3748';
+                selectPlaceholder.style.fontWeight = '500';
+            } else {
+                selectPlaceholder.textContent = 'Ընտրեք դասընթացները...';
+                selectPlaceholder.style.color = '#718096';
+                selectPlaceholder.style.fontWeight = 'normal';
+            }
+            
+            // Close dropdown
+            coursesDropdown.style.display = 'none';
+            dropdownTrigger.style.borderColor = '#e2e8f0';
+            dropdownTrigger.style.boxShadow = 'none';
+            
+            // Update UI
+            updateSelectedCoursesList();
+            calculateTotal();
+        }
+
+        function updateSelectedCoursesList() {
+            if (selectedCourses.length > 0) {
+                selectedCoursesList.innerHTML = selectedCourses.map(course => `
+                    <div class="selected-course-item">
+                        <div>
+                            <strong style="font-size: 1.1rem;">${course.name}</strong><br>
+                            <span style="color: #4a5568; font-size: 1rem;">${course.price.toLocaleString('hy-AM')} AMD</span>
+                        </div>
+                        <button class="remove-course-btn" data-course-id="${course.id}">
+                            Ջնջել
+                        </button>
+                    </div>
+                `).join('');
+                
+                selectedCoursesContainer.style.display = 'block';
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-course-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const courseId = this.getAttribute('data-course-id');
+                        removeCourse(courseId);
+                    });
+                });
+            } else {
+                selectedCoursesContainer.style.display = 'none';
+            }
+        }
+
+        function removeCourse(courseId) {
+            // Remove from selected array
+            selectedCourses = selectedCourses.filter(course => course.id !== courseId);
+            
+            // Uncheck in dropdown
+            const checkbox = document.querySelector(`input[value="${courseId}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+            
+            // Update UI
+            updateConfirmButton();
+            updateSelectedCoursesList();
+            
+            // Update placeholder
+            if (selectedCourses.length > 0) {
+                selectPlaceholder.textContent = `Ընտրված է ${selectedCourses.length} դասընթաց`;
+            } else {
+                selectPlaceholder.textContent = 'Ընտրեք դասընթացները...';
+                selectPlaceholder.style.color = '#718096';
+                selectPlaceholder.style.fontWeight = 'normal';
+            }
+            
+            calculateTotal();
+        }
+
+        function applyPromoCode() {
+            const promoCode = promoCodeInput.value.trim().toUpperCase();
+            
+            if (VALID_PROMO_CODES.hasOwnProperty(promoCode)) {
+                currentPromoCode = promoCode;
+                promoCodeInput.style.borderColor = '#38a169';
+                promoMessage.style.color = '#38a169';
+                promoMessage.innerHTML = '<strong>✓ Պրոմո կոդը հաստատված է:</strong> Դուք կստանաք լրացուցիչ 10% զեղչ:';
+                
+                // Visual feedback on button
+                applyPromoButton.style.background = '#38a169';
+                applyPromoButton.textContent = 'Կիրառված ✓';
+                setTimeout(() => {
+                    applyPromoButton.style.background = '#4299e1';
+                    applyPromoButton.textContent = 'Կիրառել կոդը';
+                }, 1500);
+            } else if (promoCode === '') {
+                currentPromoCode = '';
+                promoCodeInput.style.borderColor = '#e2e8f0';
+                promoMessage.textContent = '';
+            } else {
+                currentPromoCode = '';
+                promoCodeInput.style.borderColor = '#fc8181';
+                promoMessage.style.color = '#c53030';
+                promoMessage.textContent = 'Պրոմո կոդը անվավեր է:';
+            }
+            
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const courseCount = selectedCourses.length;
+            
+            // Calculate base total
+            let total = selectedCourses.reduce((sum, course) => sum + course.price, 0);
+            
+            // Quantity discounts
+            let quantityDiscount = 0;
+            let quantityDiscountText = '';
+            
+            if (courseCount > 3) {
+                quantityDiscount = total * 0.10;
+                quantityDiscountText = '10% զեղչ 3+ դասընթացի համար';
+            } else if (courseCount === 3) {
+                quantityDiscount = total * 0.07;
+                quantityDiscountText = '7% զեղչ 3 դասընթացի համար';
+            } else if (courseCount === 2) {
+                quantityDiscount = total * 0.05;
+                quantityDiscountText = '5% զեղչ 2 դասընթացի համար';
+            }
+            
+            // Promo code discount
+            let promoDiscount = 0;
+            if (currentPromoCode && VALID_PROMO_CODES[currentPromoCode]) {
+                promoDiscount = (total - quantityDiscount) * VALID_PROMO_CODES[currentPromoCode];
+            }
+            
+            // Final total
+            const finalTotal = total - quantityDiscount - promoDiscount;
+            
+            // Update UI
+            totalAmountDisplay.textContent = finalTotal.toLocaleString('hy-AM');
+            courseCountText.textContent = courseCount > 0 
+                ? `Ընտրված է ${courseCount} դասընթաց` 
+                : 'Դեռևս դասընթաց չի ընտրվել';
+            
+            // Build discount info
+            let discountHTML = '';
+            if (quantityDiscount > 0 || promoDiscount > 0) {
+                discountHTML = '<div style="text-align: left; max-width: 500px; margin: 0 auto;">';
+                
+                if (total > 0) {
+                    discountHTML += `<div style="margin-bottom: 8px;">Առանձին գին՝ <strong>${total.toLocaleString('hy-AM')} AMD</strong></div>`;
+                }
+                
+                if (quantityDiscount > 0) {
+                    discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">${quantityDiscountText}: <strong>-${quantityDiscount.toLocaleString('hy-AM')} AMD</strong></div>`;
+                }
+                
+                if (promoDiscount > 0) {
+                    discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">10% լրացուցիչ զեղչ պրոմո կոդով: <strong>-${promoDiscount.toLocaleString('hy-AM')} AMD</strong></div>`;
+                }
+                
+                const totalDiscount = quantityDiscount + promoDiscount;
+                const discountPercent = total > 0 ? Math.round((totalDiscount / total) * 100) : 0;
+                
+                discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; font-weight: bold; color: #234e52;">`;
+                discountHTML += `Ընդհանուր խնայողություն՝ <strong>${totalDiscount.toLocaleString('hy-AM')} AMD</strong> (${discountPercent}%)`;
+                discountHTML += `</div></div>`;
+            } else if (courseCount > 0) {
+                discountHTML = 'Զեղչեր չեն կիրառվել: Ընտրեք ավելի շատ դասընթացներ կամ մուտքագրեք պրոմո կոդ զեղչ ստանալու համար:';
+            } else {
+                discountHTML = 'Ընտրեք դասընթացները զեղչերի հաշվարկման համար:';
+            }
+            
+            discountInfo.innerHTML = discountHTML;
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            updateConfirmButton();
+            updatePromoButton();
+            calculateTotal();
+            
+            console.log('Dimordi Course Calculator loaded successfully!');
+        });
+    </script>
+</body>
+</html>
