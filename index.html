@@ -99,7 +99,7 @@
         border-radius: 0 0 12px 12px;
         z-index: 1000;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        max-height: 400px;
+        max-height: 500px;
         overflow: hidden;
     }
 
@@ -109,6 +109,15 @@
         border-bottom: 2px solid #f7fafc;
         text-align: right;
         background: #f8fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selection-info {
+        color: #4a5568;
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
     .confirm-selection-btn {
@@ -122,6 +131,7 @@
         font-weight: 600;
         transition: all 0.3s;
         font-family: Arial, sans-serif;
+        min-width: 180px;
     }
 
     .confirm-selection-btn:hover:not(:disabled) {
@@ -135,10 +145,33 @@
         cursor: not-allowed;
     }
 
+    .confirm-selection-btn.min-courses {
+        background: #fc8181;
+    }
+
+    .confirm-selection-btn.min-courses:hover:not(:disabled) {
+        background: #f56565;
+    }
+
     /* ===== COURSE OPTIONS LIST ===== */
     .courses-list {
-        max-height: 300px;
+        max-height: 400px;
         overflow-y: auto;
+    }
+
+    .course-group {
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .course-group-title {
+        padding: 12px 18px;
+        background: #f8fafc;
+        font-weight: bold;
+        color: #2d3748;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+        border-left: 4px solid #4299e1;
     }
 
     .option-item {
@@ -179,6 +212,32 @@
         color: #718096;
         font-size: 1rem;
         font-family: Arial, sans-serif;
+    }
+
+    .course-not-available {
+        opacity: 0.6;
+        cursor: not-allowed;
+        position: relative;
+    }
+
+    .course-not-available::after {
+        content: "Դեռ հասանելի չէ";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #a0aec0;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .course-not-available input[type="checkbox"] {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     /* ===== SELECTED COURSES DISPLAY ===== */
@@ -406,8 +465,20 @@
             font-size: 1.125rem !important;
         }
 
-        .course-price {
-            font-size: 0.9375rem !important;
+        .confirm-button-container {
+            flex-direction: column !important;
+            gap: 10px !important;
+            align-items: stretch !important;
+        }
+
+        .selection-info {
+            text-align: center !important;
+            order: 2 !important;
+        }
+
+        .confirm-selection-btn {
+            order: 1 !important;
+            width: 100% !important;
         }
 
         .promo-input-wrapper {
@@ -460,6 +531,26 @@
             margin-top: 30px !important;
             padding-top: 12px !important;
         }
+        
+        /* Fix for "Դեռ հասանելի չէ" on mobile */
+        .course-not-available::after {
+            position: static !important;
+            transform: none !important;
+            display: inline-block !important;
+            margin-left: 10px !important;
+            margin-top: 5px !important;
+            top: auto !important;
+            right: auto !important;
+        }
+        
+        .course-not-available {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+        
+        .course-not-available .course-info {
+            width: 100% !important;
+        }
     }
 
     @media (max-width: 480px) {
@@ -488,10 +579,6 @@
         .course-name {
             font-size: 1.0625rem !important;
         }
-        
-        .course-price {
-            font-size: 0.875rem !important;
-        }
 
         .confirm-selection-btn, .apply-promo-btn {
             padding: 12px 15px !important;
@@ -517,6 +604,12 @@
         .discount-info {
             font-size: 1rem !important;
         }
+        
+        /* Smaller "Դեռ հասանելի չէ" on very small screens */
+        .course-not-available::after {
+            font-size: 0.7rem !important;
+            padding: 3px 6px !important;
+        }
     }
     </style>
 </head>
@@ -537,57 +630,260 @@
             <div class="select-options" id="coursesDropdown">
                 <!-- Confirmation Button -->
                 <div class="confirm-button-container">
+                    <div id="selectionInfo" class="selection-info">Ընտրված է 0 դասընթաց</div>
                     <button id="confirmButton" class="confirm-selection-btn" disabled>
-                        Հաստատել ընտրությունը
+                        Ընտրեք առնվազն 4-ը
                     </button>
                 </div>
                 
                 <!-- Courses List -->
                 <div class="courses-list">
-                    <!-- Course 1 -->
-                    <label class="option-item" data-course-id="course1">
-                        <input type="checkbox" value="course1">
-                        <div class="course-info">
-                            <div class="course-name">Շտեմարան 1, գլուխ 1</div>
-                            <div class="course-price">5,900 դրամ</div>
-                        </div>
-                    </label>
+                    <!-- Original Courses -->
+                    <div class="course-group">
+                        <div class="course-group-title">Հիմնական դասընթացներ</div>
+                        
+                        <label class="option-item" data-course-id="course1">
+                            <input type="checkbox" value="course1">
+                            <div class="course-info">
+                                <div class="course-name">Շտեմարան 1, գլուխ 1</div>
+                                <div class="course-price">5,900 դրամ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="course2">
+                            <input type="checkbox" value="course2">
+                            <div class="course-info">
+                                <div class="course-name">Շտեմարան 2, գլուխ 1</div>
+                                <div class="course-price">11,900 դրամ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="course3">
+                            <input type="checkbox" value="course3">
+                            <div class="course-info">
+                                <div class="course-name">Շտեմարան 1, գլուխ 2</div>
+                                <div class="course-price">34,900 դրամ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="course4">
+                            <input type="checkbox" value="course4">
+                            <div class="course-info">
+                                <div class="course-name">Շտեմարան 2, գլուխ 2</div>
+                                <div class="course-price">54,900 դրամ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="course5">
+                            <input type="checkbox" value="course5">
+                            <div class="course-info">
+                                <div class="course-name">Շտեմարան 1 և 2․ Երկրաչափության բաժիններ</div>
+                                <div class="course-price">64,900 դրամ</div>
+                            </div>
+                        </label>
+                    </div>
                     
-                    <!-- Course 2 -->
-                    <label class="option-item" data-course-id="course2">
-                        <input type="checkbox" value="course2">
-                        <div class="course-info">
-                            <div class="course-name">Շտեմարան 2, գլուխ 1</div>
-                            <div class="course-price">11,900 դրամ</div>
-                        </div>
-                    </label>
+                    <!-- New Courses - Շտեմարան 1, Գլուխ 2 -->
+                    <div class="course-group">
+                        <div class="course-group-title">Շտեմարան 1, Գլուխ 2 - Բաժիններ</div>
+                        
+                        <label class="option-item" data-course-id="s1g2b1">
+                            <input type="checkbox" value="s1g2b1">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 1. Արտահայտությունների ձևափոխություններ և արժեքների հաշվում</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g2b2">
+                            <input type="checkbox" value="s1g2b2">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 2. Հավասարումներ և անհավասարումներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g2b3">
+                            <input type="checkbox" value="s1g2b3">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 3. Տեքստային խնդիրներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g2b4">
+                            <input type="checkbox" value="s1g2b4">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 4. Պրոգրեսիաներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g2b5">
+                            <input type="checkbox" value="s1g2b5">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 5. Ֆունկցիաներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g2b6">
+                            <input type="checkbox" value="s1g2b6">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 6. Հարթաչափություն</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g2b7">
+                            <input type="checkbox" value="s1g2b7">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 7. Տարածաչափություն</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g2b8">
+                            <input type="checkbox" value="s1g2b8">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 8. Միացություններ</div>
+                            </div>
+                        </label>
+                    </div>
                     
-                    <!-- Course 3 -->
-                    <label class="option-item" data-course-id="course3">
-                        <input type="checkbox" value="course3">
-                        <div class="course-info">
-                            <div class="course-name">Շտեմարան 1, գլուխ 2</div>
-                            <div class="course-price">34,900 դրամ</div>
-                        </div>
-                    </label>
+                    <!-- New Courses - Շտեմարան 1, Գլուխ 3 -->
+                    <div class="course-group">
+                        <div class="course-group-title">Շտեմարան 1, Գլուխ 3 - Բաժիններ</div>
+                        
+                        <label class="option-item course-not-available" data-course-id="s1g3b1">
+                            <input type="checkbox" value="s1g3b1" disabled>
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 1. Հավասարումներ և անհավասարումներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item course-not-available" data-course-id="s1g3b2">
+                            <input type="checkbox" value="s1g3b2" disabled>
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 2. Ֆունկցիաներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g3b3">
+                            <input type="checkbox" value="s1g3b3">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 3. Հարթաչափություն</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s1g3b4">
+                            <input type="checkbox" value="s1g3b4">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 4. Տարածաչափություն</div>
+                            </div>
+                        </label>
+                    </div>
                     
-                    <!-- Course 4 -->
-                    <label class="option-item" data-course-id="course4">
-                        <input type="checkbox" value="course4">
-                        <div class="course-info">
-                            <div class="course-name">Շտեմարան 2, գլուխ 2</div>
-                            <div class="course-price">54,900 դրամ</div>
-                        </div>
-                    </label>
+                    <!-- New Courses - Շտեմարան 2, Գլուխ 2 -->
+                    <div class="course-group">
+                        <div class="course-group-title">Շտեմարան 2, Գլուխ 2 - Բաժիններ</div>
+                        
+                        <label class="option-item" data-course-id="s2g2b1">
+                            <input type="checkbox" value="s2g2b1">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 1. Արտահայտությունների ձևափոխություններ և արժեքների հաշվում</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g2b2">
+                            <input type="checkbox" value="s2g2b2">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 2. Հավասարումներ և անհավասարումներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g2b3">
+                            <input type="checkbox" value="s2g2b3">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 3. Տեքստային խնդիրներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g2b4">
+                            <input type="checkbox" value="s2g2b4">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 4. Ֆունկցիաներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g2b5">
+                            <input type="checkbox" value="s2g2b5">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 5. Հարթաչափություն</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g2b6">
+                            <input type="checkbox" value="s2g2b6">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 6. Տարածաչափություն</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g2b7">
+                            <input type="checkbox" value="s2g2b7">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 7. Կոորդինատների մեթոդ, վեկտորներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g2b8">
+                            <input type="checkbox" value="s2g2b8">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 8. Միացություններ</div>
+                            </div>
+                        </label>
+                    </div>
                     
-                    <!-- Course 5 -->
-                    <label class="option-item" data-course-id="course5">
-                        <input type="checkbox" value="course5">
-                        <div class="course-info">
-                            <div class="course-name">Շտեմարան 1 և 2․ Երկրաչափության բաժիններ</div>
-                            <div class="course-price">64,900 դրամ</div>
-                        </div>
-                    </label>
+                    <!-- New Courses - Շտեմարան 2, Գլուխ 3 -->
+                    <div class="course-group">
+                        <div class="course-group-title">Շտեմարան 2, Գլուխ 3 - Բաժիններ</div>
+                        
+                        <label class="option-item course-not-available" data-course-id="s2g3b1">
+                            <input type="checkbox" value="s2g3b1" disabled>
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 1. Թվաբանական առաջադրանքներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item course-not-available" data-course-id="s2g3b2">
+                            <input type="checkbox" value="s2g3b2" disabled>
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 2. Հավասարումներ և անհավասարումներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item course-not-available" data-course-id="s2g3b3">
+                            <input type="checkbox" value="s2g3b3" disabled>
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 3. Պրոգրեսիաներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item course-not-available" data-course-id="s2g3b4">
+                            <input type="checkbox" value="s2g3b4" disabled>
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 4. Ֆունկցիաներ</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g3b5">
+                            <input type="checkbox" value="s2g3b5">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 5. Հարթաչափություն</div>
+                            </div>
+                        </label>
+                        
+                        <label class="option-item" data-course-id="s2g3b6">
+                            <input type="checkbox" value="s2g3b6">
+                            <div class="course-info">
+                                <div class="course-name">Բաժին 6. Տարածաչափություն</div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -629,23 +925,55 @@
     <script>
         // ==================== COURSE DATA ====================
         const courses = {
+            // Original courses with their actual prices
             course1: { name: 'Շտեմարան 1, գլուխ 1', price: 5900 },
             course2: { name: 'Շտեմարան 2, գլուխ 1', price: 11900 },
             course3: { name: 'Շտեմարան 1, գլուխ 2', price: 34900 },
             course4: { name: 'Շտեմարան 2, գլուխ 2', price: 54900 },
-            course5: { name: 'Շտեմարան 1 և 2․ Երկրաչափության բաժիններ', price: 64900 }
+            course5: { name: 'Շտեմարան 1 և 2․ Երկրաչափության բաժիններ', price: 64900 },
+            
+            // New courses - Շտեմարան 1, Գլուխ 2 (temporary 22000 price for calculation)
+            s1g2b1: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 1. Արտահայտությունների ձևափոխություններ և արժեքների հաշվում', basePrice: 22000 },
+            s1g2b2: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 2. Հավասարումներ և անհավասարումներ', basePrice: 22000 },
+            s1g2b3: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 3. Տեքստային խնդիրներ', basePrice: 22000 },
+            s1g2b4: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 4. Պրոգրեսիաներ', basePrice: 22000 },
+            s1g2b5: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 5. Ֆունկցիաներ', basePrice: 22000 },
+            s1g2b6: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 6. Հարթաչափություն', basePrice: 22000 },
+            s1g2b7: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 7. Տարածաչափություն', basePrice: 22000 },
+            s1g2b8: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 2, ԲԱԺԻՆ 8. Միացություններ', basePrice: 22000 },
+            
+            // New courses - Շտեմարան 1, Գլուխ 3 (only available ones)
+            s1g3b3: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 3, ԲԱԺԻՆ 3. Հարթաչափություն', basePrice: 22000 },
+            s1g3b4: { name: 'ՇՏԵՄԱՐԱՆ 1, ԳԼՈՒԽ 3, ԲԱԺԻՆ 4. Տարածաչափություն', basePrice: 22000 },
+            
+            // New courses - Շտեմարան 2, Գլուխ 2
+            s2g2b1: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 1. Արտահայտությունների ձևափոխություններ և արժեքների հաշվում', basePrice: 22000 },
+            s2g2b2: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 2. Հավասարումներ և անհավասարումներ', basePrice: 22000 },
+            s2g2b3: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 3. Տեքստային խնդիրներ', basePrice: 22000 },
+            s2g2b4: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 4. Ֆունկցիաներ', basePrice: 22000 },
+            s2g2b5: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 5. Հարթաչափություն', basePrice: 22000 },
+            s2g2b6: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 6. Տարածաչափություն', basePrice: 22000 },
+            s2g2b7: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 7. Կոորդինատների մեթոդ, վեկտորներ', basePrice: 22000 },
+            s2g2b8: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 2, ԲԱԺԻՆ 8. Միացություններ', basePrice: 22000 },
+            
+            // New courses - Շտեմարան 2, Գլուխ 3 (only available ones)
+            s2g3b5: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 3, ԲԱԺԻՆ 5. Հարթաչափություն', basePrice: 22000 },
+            s2g3b6: { name: 'ՇՏԵՄԱՐԱՆ 2, ԳԼՈՒԽ 3, ԲԱԺԻՆ 6. Տարածաչափություն', basePrice: 22000 }
         };
 
         // ==================== APPLICATION STATE ====================
         let selectedCourses = [];
         let currentPromoCode = '';
         const VALID_PROMO_CODES = { 'PROMO10': 0.10 };
+        const MIN_COURSES_REQUIRED = 4;
+        const NEW_COURSE_BASE_PRICE = 22000; // Will be shown as "Սկզբնական գինը" in results
 
         // ==================== DOM ELEMENTS ====================
         const dropdownTrigger = document.getElementById('dropdownTrigger');
         const coursesDropdown = document.getElementById('coursesDropdown');
         const selectPlaceholder = document.getElementById('selectPlaceholder');
         const confirmButton = document.getElementById('confirmButton');
+        const selectionInfo = document.getElementById('selectionInfo');
         const selectedCoursesContainer = document.getElementById('selectedCoursesContainer');
         const selectedCoursesList = document.getElementById('selectedCoursesList');
         const promoCodeInput = document.getElementById('promoCode');
@@ -680,19 +1008,31 @@
 
         // ==================== CHECKBOX & BUTTON UPDATES ====================
         function updateConfirmButton() {
-            const checkboxes = document.querySelectorAll('.select-options input[type="checkbox"]');
-            let anyChecked = false;
+            const checkboxes = document.querySelectorAll('.select-options input[type="checkbox"]:not(:disabled)');
+            let selectedCount = 0;
             
             checkboxes.forEach(checkbox => {
-                if (checkbox.checked) anyChecked = true;
+                if (checkbox.checked) selectedCount++;
             });
             
-            if (anyChecked) {
-                confirmButton.style.background = '#4299e1';
+            // Update selection info
+            selectionInfo.textContent = `Ընտրված է ${selectedCount} դասընթաց`;
+            
+            if (selectedCount >= MIN_COURSES_REQUIRED) {
+                confirmButton.textContent = 'Հաստատել ընտրությունը';
+                confirmButton.classList.remove('min-courses');
                 confirmButton.disabled = false;
-            } else {
-                confirmButton.style.background = '#cbd5e0';
+                confirmButton.style.background = '#4299e1';
+            } else if (selectedCount > 0) {
+                confirmButton.textContent = `Ընտրեք առնվազն ${MIN_COURSES_REQUIRED}-ը`;
+                confirmButton.classList.add('min-courses');
                 confirmButton.disabled = true;
+                confirmButton.style.background = '#fc8181';
+            } else {
+                confirmButton.textContent = `Ընտրեք առնվազն ${MIN_COURSES_REQUIRED}-ը`;
+                confirmButton.classList.add('min-courses');
+                confirmButton.disabled = true;
+                confirmButton.style.background = '#cbd5e0';
             }
         }
 
@@ -709,17 +1049,35 @@
         }
 
         // ==================== EVENT LISTENERS ====================
-        document.querySelectorAll('.select-options input[type="checkbox"]').forEach(checkbox => {
+        document.querySelectorAll('.select-options input[type="checkbox"]:not(:disabled)').forEach(checkbox => {
             checkbox.addEventListener('change', updateConfirmButton);
         });
 
         confirmButton.addEventListener('click', function() {
+            const checkboxes = document.querySelectorAll('.select-options input[type="checkbox"]:not(:disabled)');
+            let selectedCount = 0;
+            
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) selectedCount++;
+            });
+            
+            if (selectedCount < MIN_COURSES_REQUIRED) {
+                // Show error message
+                this.style.background = '#fc8181';
+                this.textContent = `Ընտրեք առնվազն ${MIN_COURSES_REQUIRED} դասընթաց`;
+                
+                setTimeout(() => {
+                    updateConfirmButton();
+                }, 1500);
+                return;
+            }
+            
+            // If enough courses are selected, proceed
             this.style.background = '#38a169';
             this.textContent = 'Հաստատված ✓';
             
             setTimeout(() => {
-                this.style.background = '#4299e1';
-                this.textContent = 'Հաստատել ընտրությունը';
+                updateConfirmButton();
             }, 1000);
             
             processCourseSelection();
@@ -743,26 +1101,27 @@
 
         // ==================== CORE LOGIC FUNCTIONS ====================
         function processCourseSelection() {
-            const checkboxes = document.querySelectorAll('.select-options input[type="checkbox"]');
+            const checkboxes = document.querySelectorAll('.select-options input[type="checkbox"]:not(:disabled)');
             selectedCourses = [];
             
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     const courseId = checkbox.value;
-                    selectedCourses.push({
-                        id: courseId,
-                        name: courses[courseId].name,
-                        price: courses[courseId].price
-                    });
+                    if (courses[courseId]) {
+                        selectedCourses.push({
+                            id: courseId,
+                            name: courses[courseId].name
+                        });
+                    }
                 }
             });
             
-            if (selectedCourses.length > 0) {
+            if (selectedCourses.length >= MIN_COURSES_REQUIRED) {
                 selectPlaceholder.textContent = `Ընտրված է ${selectedCourses.length} դասընթաց`;
                 selectPlaceholder.style.color = '#2d3748';
                 selectPlaceholder.style.fontWeight = '500';
             } else {
-                selectPlaceholder.textContent = 'Ընտրեք դասընթացները...';
+                selectPlaceholder.textContent = 'Ընտրեք դասընթացները';
                 selectPlaceholder.style.color = '#718096';
                 selectPlaceholder.style.fontWeight = 'normal';
             }
@@ -780,8 +1139,7 @@
                 selectedCoursesList.innerHTML = selectedCourses.map(course => `
                     <div class="selected-course-item">
                         <div>
-                            <strong style="font-size: 1.1rem;">${course.name}</strong><br>
-                            <span style="color: #4a5568; font-size: 1rem;">${course.price.toLocaleString('hy-AM')} դրամ</span>
+                            <strong style="font-size: 1.1rem;">${course.name}</strong>
                         </div>
                         <button class="remove-course-btn" data-course-id="${course.id}">
                             Ջնջել
@@ -813,10 +1171,10 @@
             updateConfirmButton();
             updateSelectedCoursesList();
             
-            if (selectedCourses.length > 0) {
+            if (selectedCourses.length >= MIN_COURSES_REQUIRED) {
                 selectPlaceholder.textContent = `Ընտրված է ${selectedCourses.length} դասընթաց`;
             } else {
-                selectPlaceholder.textContent = 'Ընտրեք դասընթացները...';
+                selectPlaceholder.textContent = 'Ընտրեք դասընթացները';
                 selectPlaceholder.style.color = '#718096';
                 selectPlaceholder.style.fontWeight = 'normal';
             }
@@ -824,122 +1182,152 @@
             calculateTotal();
         }
 
-function applyPromoCode() {
-    const promoCode = promoCodeInput.value.trim();
-    
-    if (promoCode === 'PROMO10') {
-        currentPromoCode = promoCode;
-        promoCodeInput.style.borderColor = '#38a169';
-        promoMessage.style.color = '#38a169';
-        promoMessage.innerHTML = '<strong>Պրոմո կոդը հաստատված է:</strong> Դուք կստանաք լրացուցիչ 10% զեղչ:';
-        
-        // Apply green color permanently for valid promo
-        applyPromoButton.style.background = '#38a169';
-        applyPromoButton.textContent = 'Կիրառված է ✓';
-        applyPromoButton.disabled = true; // Optional: disable button after applying
-        
-        // Only reset if user clears the promo code input
-        promoCodeInput.addEventListener('input', function onPromoInputChange() {
-            if (this.value.trim() !== currentPromoCode) {
-                // Reset promo state if user changes the input
+        function applyPromoCode() {
+            const promoCode = promoCodeInput.value.trim();
+            
+            if (promoCode === 'PROMO10') {
+                currentPromoCode = promoCode;
+                promoCodeInput.style.borderColor = '#38a169';
+                promoMessage.style.color = '#38a169';
+                promoMessage.innerHTML = '<strong>Պրոմո կոդը հաստատված է:</strong> Դուք կստանաք լրացուցիչ 10% զեղչ:';
+                
+                // Apply green color permanently for valid promo
+                applyPromoButton.style.background = '#38a169';
+                applyPromoButton.textContent = 'Կիրառված է';
+                applyPromoButton.disabled = true;
+                
+                // Only reset if user clears the promo code input
+                promoCodeInput.addEventListener('input', function onPromoInputChange() {
+                    if (this.value.trim() !== currentPromoCode) {
+                        // Reset promo state if user changes the input
+                        currentPromoCode = '';
+                        applyPromoButton.style.background = '#4299e1';
+                        applyPromoButton.textContent = 'Կիրառել կոդը';
+                        applyPromoButton.disabled = false;
+                        promoCodeInput.style.borderColor = '#e2e8f0';
+                        promoMessage.textContent = '';
+                        
+                        // Remove this event listener to avoid multiple bindings
+                        this.removeEventListener('input', onPromoInputChange);
+                        calculateTotal();
+                    }
+                });
+                
+            } else if (promoCode === '') {
                 currentPromoCode = '';
-                applyPromoButton.style.background = '#4299e1';
-                applyPromoButton.textContent = 'Կիրառել կոդը';
-                applyPromoButton.disabled = false;
                 promoCodeInput.style.borderColor = '#e2e8f0';
                 promoMessage.textContent = '';
-                
-                // Remove this event listener to avoid multiple bindings
-                this.removeEventListener('input', onPromoInputChange);
-                calculateTotal();
-            }
-        });
-        
-    } else if (promoCode === '') {
-        currentPromoCode = '';
-        promoCodeInput.style.borderColor = '#e2e8f0';
-        promoMessage.textContent = '';
-        applyPromoButton.style.background = '#4299e1';
-        applyPromoButton.textContent = 'Կիրառել կոդը';
-    } else {
-        currentPromoCode = '';
-        promoCodeInput.style.borderColor = '#fc8181';
-        promoMessage.style.color = '#c53030';
-        promoMessage.textContent = 'Պրոմո կոդը անվավեր է:';
-        
-        // Reset button after showing error (optional)
-        setTimeout(() => {
-            if (promoCodeInput.value.trim() !== 'PROMO10') {
                 applyPromoButton.style.background = '#4299e1';
-                applyPromoButton.textContent = 'Կիրառել կոդը';
+                applyPromoButton.textContent = 'Կիրառել';
+            } else {
+                currentPromoCode = '';
+                promoCodeInput.style.borderColor = '#fc8181';
+                promoMessage.style.color = '#c53030';
+                promoMessage.textContent = 'Պրոմո կոդը անվավեր է:';
+                
+                // Reset button after showing error (optional)
+                setTimeout(() => {
+                    if (promoCodeInput.value.trim() !== 'PROMO10') {
+                        applyPromoButton.style.background = '#4299e1';
+                        applyPromoButton.textContent = 'Կիրառել կոդը';
+                    }
+                }, 1500);
             }
-        }, 1500);
-    }
-    
-    calculateTotal();
-}
+            
+            calculateTotal();
+        }
 
-    function calculateTotal() {
-        const courseCount = selectedCourses.length;
-        
-        let total = selectedCourses.reduce((sum, course) => sum + course.price, 0);
-        
-        let quantityDiscount = 0;
-        let quantityDiscountText = '';
-        
-        if (courseCount > 3) {
-            quantityDiscount = total * 0.10;
-            quantityDiscountText = '10% զեղչ 3+ դասընթացի համար';
-        } else if (courseCount === 3) {
-            quantityDiscount = total * 0.07;
-            quantityDiscountText = '7% զեղչ 3 դասընթացի համար';
-        } else if (courseCount === 2) {
-            quantityDiscount = total * 0.05;
-            quantityDiscountText = '5% զեղչ 2 դասընթացի համար';
-        }
-        
-        let promoDiscount = 0;
-        if (currentPromoCode && VALID_PROMO_CODES[currentPromoCode]) {
-            promoDiscount = (total - quantityDiscount) * VALID_PROMO_CODES[currentPromoCode];
-        }
-        
-        const finalTotal = total - quantityDiscount - promoDiscount;
-        
-        totalAmountDisplay.textContent = finalTotal.toLocaleString('hy-AM');
-        courseCountText.textContent = courseCount > 0 
-            ? `Ընտրված է ${courseCount} դասընթաց` 
-            : 'Դեռևս դասընթաց չի ընտրվել';
-        
-        let discountHTML = '';
-        if (quantityDiscount > 0 || promoDiscount > 0) {
-            discountHTML = '<div style="text-align: left; max-width: 500px; margin: 0 auto;">';
+        function calculateTotal() {
+            const courseCount = selectedCourses.length;
             
-            if (total > 0) {
-                discountHTML += `<div style="margin-bottom: 8px;">Սկզբնական գինը՝ <span style="font-weight: 600;">${total.toLocaleString('hy-AM')} դրամ</span></div>`;
+            if (courseCount >= MIN_COURSES_REQUIRED) {
+                // Calculate total price
+                let total = 0;
+                
+                // Count original courses and new courses separately
+                let originalCoursesCount = 0;
+                let newCoursesCount = 0;
+                
+                selectedCourses.forEach(course => {
+                    const courseId = course.id;
+                    if (courseId.startsWith('course')) {
+                        // Original course - use actual price
+                        total += courses[courseId].price || 0;
+                        originalCoursesCount++;
+                    } else {
+                        // New course - use base price for calculation
+                        total += NEW_COURSE_BASE_PRICE;
+                        newCoursesCount++;
+                    }
+                });
+                
+                // Calculate quantity discount based on your specified ranges
+                let quantityDiscount = 0;
+                let quantityDiscountText = '';
+                let discountPercentage = 0;
+                
+                if (courseCount >= 4 && courseCount <= 5) {
+                    discountPercentage = 0.05;
+                    quantityDiscountText = '5% զեղչ 4-5 դասընթացի համար';
+                } else if (courseCount >= 6 && courseCount <= 8) {
+                    discountPercentage = 0.07;
+                    quantityDiscountText = '7% զեղչ 6-8 դասընթացի համար';
+                } else if (courseCount >= 9 && courseCount <= 10) {
+                    discountPercentage = 0.10;
+                    quantityDiscountText = '10% զեղչ 9-10 դասընթացի համար';
+                } else if (courseCount > 10) {
+                    discountPercentage = 0.12;
+                    quantityDiscountText = '12% զեղչ 10+ դասընթացի համար';
+                }
+                
+                quantityDiscount = total * discountPercentage;
+                
+                let promoDiscount = 0;
+                if (currentPromoCode && VALID_PROMO_CODES[currentPromoCode]) {
+                    promoDiscount = (total - quantityDiscount) * VALID_PROMO_CODES[currentPromoCode];
+                }
+                
+                const finalTotal = total - quantityDiscount - promoDiscount;
+                totalAmountDisplay.textContent = finalTotal.toLocaleString('hy-AM');
+                
+                // Calculate base price for display (NEW_COURSE_BASE_PRICE per new course)
+                const basePriceDisplay = total;
+                
+                let discountHTML = '';
+                discountHTML = '<div style="text-align: left; max-width: 500px; margin: 0 auto;">';
+                
+                // Show base price
+                discountHTML += `<div style="margin-bottom: 8px;">Սկզբնական գինը՝ <span style="font-weight: 600;">${basePriceDisplay.toLocaleString('hy-AM')} դրամ</span></div>`;
+                
+                if (quantityDiscount > 0) {
+                    discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">${quantityDiscountText}: <span style="font-weight: 600;">-${quantityDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
+                }
+                
+                if (promoDiscount > 0) {
+                    discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">10% լրացուցիչ զեղչ պրոմո կոդով: <span style="font-weight: 600;">-${promoDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
+                }
+                
+                const totalDiscount = quantityDiscount + promoDiscount;
+                const discountPercent = total > 0 ? Math.round((totalDiscount / total) * 100) : 0;
+                
+                discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; color: #234e52;">`;
+                discountHTML += `Ընդհանուր խնայողությունը՝ <span style="font-weight: 600;">${totalDiscount.toLocaleString('hy-AM')} դրամ</span>`;
+                discountHTML += `</div></div>`;
+                
+                discountInfo.innerHTML = discountHTML;
+            } else {
+                totalAmountDisplay.textContent = '0';
+                if (courseCount > 0) {
+                    discountInfo.innerHTML = 'Ընտրեք առնվազն 4 դասընթաց գինը հաշվելու համար։';
+                } else {
+                    discountInfo.innerHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար։';
+                }
             }
             
-            if (quantityDiscount > 0) {
-                discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">${quantityDiscountText}: <span style="font-weight: 600;">-${quantityDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
-            }
-            
-            if (promoDiscount > 0) {
-                discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">10% լրացուցիչ զեղչ պրոմո կոդով: <span style="font-weight: 600;">-${promoDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
-            }
-            
-            const totalDiscount = quantityDiscount + promoDiscount;
-            const discountPercent = total > 0 ? Math.round((totalDiscount / total) * 100) : 0;
-            
-            discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; color: #234e52;">`;
-            discountHTML += `Ընդհանուր խնայողությունը՝ <span style="font-weight: 600;">${totalDiscount.toLocaleString('hy-AM')} դրամ</span> (${discountPercent}%)`;
-            discountHTML += `</div></div>`;
-        } else if (courseCount > 0) {
-            discountHTML = 'Զեղչեր չեն կիրառվել: Ընտրեք ավելի շատ դասընթացներ կամ մուտքագրեք պրոմո կոդ զեղչ ստանալու համար:';
-        } else {
-            discountHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար:';
+            courseCountText.textContent = courseCount > 0 
+                ? `Ընտրված է ${courseCount} դասընթաց` 
+                : 'Դեռևս դասընթաց չի ընտրվել';
         }
-        
-        discountInfo.innerHTML = discountHTML;
-    }
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -952,7 +1340,3 @@ function applyPromoCode() {
     </script>
 </body>
 </html>
-
-
-
-
