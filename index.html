@@ -12,16 +12,13 @@
         padding: 0;
         font-family: Arial, sans-serif;
     }
-    /* ===== FIX HEIGHT FOR IFRAME ===== */
-    body {
-        min-height: 1200px;
-    }
 
     body {
         background-color: #f8f9fa;
         color: #333;
         line-height: 1.6;
         padding: 15px;
+        min-height: 1300px
         font-family: Arial, sans-serif;
     }
 
@@ -33,18 +30,19 @@
         background: white;
         border-radius: 18px;
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        min-height: auto;
         font-family: Arial, sans-serif;
     }
 
     /* ===== HEADER ===== */
     .calculator-header {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 
     .calculator-header h1 {
-        font-size: 1.8rem;
-        margin-bottom: 15px;
+        font-size: 2rem;
+        margin-bottom: 25px;
         color: #1a365d;
         background: linear-gradient(135deg, #1a365d 0%, #2d6bcc 100%);
         -webkit-background-clip: text;
@@ -56,7 +54,7 @@
 
     .calculator-header p {
         color: #666;
-        font-size: 1.05rem;
+        font-size: 1.125rem;
         max-width: 750px;
         margin: 0 auto;
         line-height: 1.5;
@@ -67,7 +65,7 @@
     .custom-select {
         position: relative;
         max-width: 100%;
-        margin: 20px auto;
+        margin: 25px auto;
     }
 
     .select-header {
@@ -102,7 +100,7 @@
         border-radius: 0 0 12px 12px;
         z-index: 1000;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        max-height: 350px;
+        max-height: 500px;
         overflow: hidden;
     }
 
@@ -158,7 +156,7 @@
 
     /* ===== COURSE OPTIONS LIST ===== */
     .courses-list {
-        max-height: 550px;
+        max-height: 400px;
         overflow-y: auto;
     }
 
@@ -243,31 +241,30 @@
         cursor: not-allowed;
     }
 
-    /* ===== SELECTED COURSES DISPLAY ===== */
+    /* ===== SELECTED COURSES DISPLAY - MODIFIED FOR COLUMN LAYOUT WITH SCROLL BAR ===== */
     #selectedCoursesContainer {
-        margin: 20px 0;
+        margin: 30px 0;
         display: none;
     }
 
     .selected-courses-title {
         text-align: center;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         color: #2d3748;
-        font-size: 1.25rem;
+        font-size: 1.3125rem;
         font-family: Arial, sans-serif;
     }
 
     .selected-courses-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        height: 350px; /* Fixed height - prevents outer scroll */
+        gap: 8px; /* Reduced gap for smaller rows */
+        max-height: 350px; /* Slightly reduced height */
         overflow-y: auto;
-        padding: 12px;
+        padding: 12px; /* Reduced padding */
         border-radius: 12px;
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        margin-bottom: 12px;
         
         /* Custom scrollbar styling */
         scrollbar-width: thin;
@@ -276,7 +273,7 @@
 
     /* Custom scrollbar for Webkit browsers */
     .selected-courses-wrapper::-webkit-scrollbar {
-        width: 8px;
+        width: 8px; /* Smaller scrollbar */
     }
 
     .selected-courses-wrapper::-webkit-scrollbar-track {
@@ -296,30 +293,33 @@
 
     .selected-course-item {
         display: flex;
-        align-items: flex-start;
+        align-items: flex-start; /* Align items to top for multi-line text */
         justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px;
+        gap: 12px; /* Reduced gap */
+        padding: 10px 12px; /* Reduced padding for smaller rows */
         background: linear-gradient(90deg, #f0f9ff, #ffffff);
-        border-radius: 8px;
+        border-radius: 8px; /* Slightly smaller radius */
         border-left: 4px solid #4299e1;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Smaller shadow */
         transition: all 0.2s;
         width: 100%;
         flex-shrink: 0;
+        min-height: 50px; /* Minimum height for consistency */
     }
 
     .selected-course-item:hover {
-        transform: translateY(-1px);
+        transform: translateY(-1px); /* Reduced hover effect */
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
     .course-name-text {
         font-weight: 600;
         color: #2d3748;
-        font-size: 0.95rem;
+        font-size: 0.95rem; /* Slightly smaller font */
         line-height: 1.4;
         flex-grow: 1;
+        max-width: 75%;
+        /* Allow text to wrap to multiple lines */
         word-wrap: break-word;
         overflow-wrap: break-word;
         white-space: normal;
@@ -331,16 +331,16 @@
         color: white;
         border: none;
         border-radius: 6px;
-        padding: 6px 12px;
+        padding: 6px 12px; /* Smaller padding */
         cursor: pointer;
-        font-size: 0.85rem;
+        font-size: 0.85rem; /* Smaller font */
         font-weight: 500;
         transition: all 0.2s;
         white-space: nowrap;
         font-family: Arial, sans-serif;
         flex-shrink: 0;
-        margin-top: 2px;
-        align-self: flex-start;
+        margin-top: 2px; /* Align with first line of text */
+        align-self: flex-start; /* Align button to top */
     }
 
     .remove-course-btn:hover {
@@ -351,18 +351,18 @@
     /* ===== PROMO CODE SECTION ===== */
     .promo-section {
         max-width: 100%;
-        margin: 20px auto;
-        padding: 15px;
+        margin: 30px auto;
+        padding: 20px;
         background: #f8fafc;
-        border-radius: 12px;
+        border-radius: 15px;
         border: 2px solid #e2e8f0;
     }
 
     .promo-title {
         text-align: center;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         color: #2d3748;
-        font-size: 1.25rem;
+        font-size: 1.3125rem;
         font-family: Arial, sans-serif;
     }
 
@@ -432,18 +432,18 @@
     .results-container {
         background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
         border-left: 6px solid #38b2ac;
-        padding: 15px;
-        border-radius: 12px;
-        margin-top: 20px;
+        padding: 25px;
+        border-radius: 16px;
+        margin-top: 30px;
         text-align: center;
         font-family: Arial, sans-serif;
     }
 
     .total-amount {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: 800;
         color: #234e52;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         line-height: 1.2;
         font-family: Arial, sans-serif;
     }
@@ -454,27 +454,27 @@
     }
 
     .course-count {
-        font-size: 1.25rem;
+        font-size: 1.3125rem;
         color: #4a5568;
-        margin-bottom: 12px;
+        margin-bottom: 15px;
         font-family: Arial, sans-serif;
     }
 
     .discount-info {
-        font-size: 1rem;
+        font-size: 1.125rem;
         color: #4a5568;
-        line-height: 1.6;
+        line-height: 1.7;
         background: rgba(255, 255, 255, 0.7);
-        padding: 12px;
-        border-radius: 8px;
-        margin-top: 12px;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
         font-family: Arial, sans-serif;
     }
 
     /* ===== FOOTER NOTE ===== */
     .footer-note {
         text-align: center;
-        margin-top: 30px;
+        margin-top: 40px;
         color: #a0aec0;
         font-size: 1rem;
         padding-top: 15px;
@@ -482,7 +482,7 @@
         font-family: Arial, sans-serif;
     }
 
-    /* ===== RESPONSIVE DESIGN ===== */
+    /* ===== IMPROVED RESPONSIVE DESIGN ===== */
     @media (max-width: 768px) {
         body {
             padding: 12px;
@@ -497,22 +497,22 @@
         }
 
         .calculator-header h1 {
-            font-size: 1.5rem !important;
+            font-size: 1.6875rem !important;
             line-height: 1.3 !important;
             margin-bottom: 10px !important;
         }
 
         .calculator-header p {
-            font-size: 1rem !important;
+            font-size: 1.0625rem !important;
             line-height: 1.5 !important;
         }
 
         .calculator-header {
-            margin-bottom: 15px !important;
+            margin-bottom: 25px !important;
         }
 
         .custom-select {
-            margin: 15px auto !important;
+            margin: 20px auto !important;
         }
 
         .select-header {
@@ -538,7 +538,6 @@
         .confirm-selection-btn {
             order: 1 !important;
             width: 100% !important;
-            min-width: auto !important;
         }
 
         .promo-input-wrapper {
@@ -553,7 +552,7 @@
         }
 
         .total-amount {
-            font-size: 1.5rem !important;
+            font-size: 1.6875rem !important;
             line-height: 1.2 !important;
         }
 
@@ -561,9 +560,9 @@
             font-size: 1.125rem !important;
         }
         
-        /* Mobile adjustments for selected courses */
+        /* Mobile adjustments for column layout */
         .selected-courses-wrapper {
-            height: 350px !important;
+            max-height: 280px !important; /* Reduced for mobile */
             padding: 10px !important;
         }
         
@@ -572,11 +571,13 @@
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 8px !important;
+            min-height: auto !important;
         }
         
         .course-name-text {
+            max-width: 100% !important;
             font-size: 0.9rem !important;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         
         .remove-course-btn {
@@ -591,17 +592,17 @@
         }
         
         .results-container {
-            padding: 12px !important;
-            margin-top: 15px !important;
+            padding: 20px 15px !important;
+            margin-top: 25px !important;
         }
         
         .discount-info {
-            padding: 10px !important;
-            font-size: 0.95rem !important;
+            padding: 12px !important;
+            font-size: 1.0625rem !important;
         }
         
         .footer-note {
-            margin-top: 25px !important;
+            margin-top: 30px !important;
             padding-top: 12px !important;
         }
         
@@ -638,11 +639,11 @@
         }
 
         .calculator-header h1 {
-            font-size: 1.3rem !important;
+            font-size: 1.3125rem !important;
         }
 
         .calculator-header p {
-            font-size: 0.95rem !important;
+            font-size: 1rem !important;
         }
 
         .option-item {
@@ -654,12 +655,12 @@
         }
 
         .confirm-selection-btn, .apply-promo-btn {
-            padding: 10px 12px !important;
-            font-size: 0.95rem !important;
+            padding: 12px 15px !important;
+            font-size: 1rem !important;
         }
         
         .selected-courses-wrapper {
-            height: 150px !important;
+            max-height: 220px !important;
             padding: 8px !important;
         }
         
@@ -673,23 +674,23 @@
         
         .selected-courses-title {
             font-size: 1.125rem !important;
-            margin-bottom: 12px !important;
+            margin-bottom: 15px !important;
         }
         
         .results-container {
-            padding: 10px !important;
+            padding: 18px 12px !important;
         }
         
         .total-amount {
-            font-size: 1.3rem !important;
+            font-size: 1.3125rem !important;
         }
         
         .course-count {
-            font-size: 1rem !important;
+            font-size: 1.0625rem !important;
         }
         
         .discount-info {
-            font-size: 0.9rem !important;
+            font-size: 1rem !important;
         }
         
         /* Smaller "Դեռ հասանելի չէ" on very small screens */
@@ -1435,10 +1436,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
