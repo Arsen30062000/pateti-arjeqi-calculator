@@ -735,7 +735,7 @@
                 <div class="confirm-button-container">
                     <div id="selectionInfo" class="selection-info">Ընտրված է 0 դասընթաց</div>
                     <button id="confirmButton" class="confirm-selection-btn" disabled>
-                        Ընտրեք առնվազն 4-ը
+                        Ընտրեք առնվազն 2-ը
                     </button>
                 </div>
                 
@@ -1068,7 +1068,7 @@
         let selectedCourses = [];
         let currentPromoCode = '';
         const VALID_PROMO_CODES = { 'PROMO10': 0.10 };
-        const MIN_COURSES_REQUIRED = 4;
+        const MIN_COURSES_REQUIRED = 2;
 
         // ==================== DOM ELEMENTS ====================
         const dropdownTrigger = document.getElementById('dropdownTrigger');
@@ -1372,18 +1372,18 @@
                 let quantityDiscountText = '';
                 let discountPercentage = 0;
                 
-                if (courseCount >= 4 && courseCount <= 5) {
+                if (courseCount >= 2 && courseCount <= 3) {
                     discountPercentage = 0.05;
-                    quantityDiscountText = '5% զեղչ 4-5 դասընթացի համար';
-                } else if (courseCount >= 6 && courseCount <= 8) {
+                    quantityDiscountText = '5% զեղչ 2-3 դասընթացի համար';
+                } else if (courseCount >= 4 && courseCount <= 6) {
                     discountPercentage = 0.07;
-                    quantityDiscountText = '7% զեղչ 6-8 դասընթացի համար';
-                } else if (courseCount >= 9 && courseCount <= 10) {
+                    quantityDiscountText = '7% զեղչ 4-6 դասընթացի համար';
+                } else if (courseCount >= 7 && courseCount <= 8) {
                     discountPercentage = 0.10;
-                    quantityDiscountText = '10% զեղչ 9-10 դասընթացի համար';
-                } else if (courseCount > 10) {
+                    quantityDiscountText = '10% զեղչ 7-8 դասընթացի համար';
+                } else if (courseCount > 8) {
                     discountPercentage = 0.12;
-                    quantityDiscountText = '12% զեղչ 10+ դասընթացի համար';
+                    quantityDiscountText = '12% զեղչ 8+ դասընթացի համար';
                 }
                 
                 quantityDiscount = total * discountPercentage;
@@ -1424,7 +1424,7 @@
             } else {
                 totalAmountDisplay.textContent = '0';
                 if (courseCount > 0) {
-                    discountInfo.innerHTML = 'Ընտրեք առնվազն 4 դասընթաց գինը հաշվելու համար։';
+                    discountInfo.innerHTML = 'Ընտրեք առնվազն 2 դասընթաց գինը հաշվելու համար։';
                 } else {
                     discountInfo.innerHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար։';
                 }
