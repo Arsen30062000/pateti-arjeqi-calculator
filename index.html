@@ -1335,167 +1335,176 @@
         }
 
         // ==================== CALCULATE TOTAL ====================
-        function calculateTotal() {
-            const courseCount = selectedCourses.length;
-            if (courseCount >= MIN_COURSES_REQUIRED) {
-                const selectedCourseIds = selectedCourses.map(course => course.id);
-                const completeChapters = checkForCompleteChapters(selectedCourseIds);
-                const completeChaptersCount = completeChapters.length;
+function calculateTotal() {
+    const courseCount = selectedCourses.length;
+    if (courseCount >= MIN_COURSES_REQUIRED) {
+        // Create a COPY of the selected course IDs for processing
+        const selectedCourseIds = selectedCourses.map(course => course.id);
+        const completeChapters = checkForCompleteChapters(selectedCourseIds);
+        const completeChaptersCount = completeChapters.length;
+        
+        let total = 0;
+        let quantityDiscount = 0;
+        let quantityDiscountText = '';
+        let discountPercentage = 0;
+        let isSingleCompleteChapter = false;
+        
+        // Create a NEW array for the courses to be added to total
+        let coursesToCalculate = [...selectedCourseIds];
+        
+        // Check if we have complete chapters
+        if (completeChaptersCount > 0) {
+            // For complete chapters, use the full chapter price
+            completeChapters.forEach(chapterId => {
+                const chapter = chapters[chapterId];
+                total += chapter.fullPrice;
                 
-                let total = 0;
-                let quantityDiscount = 0;
-                let quantityDiscountText = '';
-                let discountPercentage = 0;
-                let isSingleCompleteChapter = false;
-                
-                // Check if we have complete chapters
-                if (completeChaptersCount > 0) {
-                    // For complete chapters, use the full chapter price
-                    completeChapters.forEach(chapterId => {
-                        const chapter = chapters[chapterId];
-                        total += chapter.fullPrice;
-                        
-                        // Remove individual section prices
-                        chapter.sectionIds.forEach(sectionId => {
-                            const index = selectedCourseIds.indexOf(sectionId);
-                            if (index !== -1) {
-                                selectedCourseIds.splice(index, 1);
-                            }
-                        });
-                    });
-                    
-                    // Add remaining courses (non-section courses or incomplete chapters)
-                    selectedCourseIds.forEach(courseId => {
-                        const course = courses[courseId];
-                        if (course.type === 'full') {
-                            total += course.price || 0;
-                        } else {
-                            total += course.basePrice || 0;
-                        }
-                    });
-                    
-                    // Check if it's a SINGLE complete chapter case
-                    if (completeChaptersCount === 1) {
-                        isSingleCompleteChapter = true;
-                        // For SINGLE complete chapter cases, NO quantity discounts apply
-                        quantityDiscount = 0;
-                        quantityDiscountText = '';
-                    } else {
-                        // For MULTIPLE complete chapters, apply quantity discounts as usual
-                        if (courseCount >= 2 && courseCount <= 3) {
-                            discountPercentage = 0.05;
-                            quantityDiscountText = '5% զեղչ 2-3 դասընթացի համար';
-                        } else if (courseCount >= 4 && courseCount <= 6) {
-                            discountPercentage = 0.07;
-                            quantityDiscountText = '7% զեղչ 4-6 դասընթացի համար';
-                        } else if (courseCount >= 7 && courseCount <= 9) {
-                            discountPercentage = 0.10;
-                            quantityDiscountText = '10% զեղչ 7-8 դասընթացի համար';
-                        } else if (courseCount > 9) {
-                            discountPercentage = 0.12;
-                            quantityDiscountText = '12% զեղչ 9+ դասընթացի համար';
-                        }
-                        quantityDiscount = total * discountPercentage;
+                // Remove individual section prices from the calculation array
+                chapter.sectionIds.forEach(sectionId => {
+                    const index = coursesToCalculate.indexOf(sectionId);
+                    if (index !== -1) {
+                        coursesToCalculate.splice(index, 1);
                     }
+                });
+            });
+            
+            // Add remaining courses (non-section courses or incomplete chapters)
+            coursesToCalculate.forEach(courseId => {
+                const course = courses[courseId];
+                if (course.type === 'full') {
+                    total += course.price || 0;
                 } else {
-                    // Regular calculation without complete chapters
-                    selectedCourses.forEach(course => {
-                        const courseId = course.id;
-                        if (courseId.startsWith('course')) {
-                            total += courses[courseId].price || 0;
-                        } else {
-                            total += courses[courseId].basePrice || 0;
-                        }
-                    });
-
-                    // Apply quantity discounts as usual
-                    if (courseCount >= 2 && courseCount <= 3) {
-                        discountPercentage = 0.05;
-                        quantityDiscountText = '5% զեղչ 2-3 դասընթացի համար';
-                    } else if (courseCount >= 4 && courseCount <= 6) {
-                        discountPercentage = 0.07;
-                        quantityDiscountText = '7% զեղչ 4-6 դասընթացի համար';
-                    } else if (courseCount >= 7 && courseCount <= 9) {
-                        discountPercentage = 0.10;
-                        quantityDiscountText = '10% զեղչ 7-8 դասընթացի համար';
-                    } else if (courseCount > 9) {
-                        discountPercentage = 0.12;
-                        quantityDiscountText = '12% զեղչ 9+ դասընթացի համար';
-                    }
-                    quantityDiscount = total * discountPercentage;
+                    total += course.basePrice || 0;
                 }
-                
-                // Apply promo discount based on conditions
-                let promoDiscount = 0;
-                let promoApplied = false;
-                
-                if (!isSingleCompleteChapter && currentPromoCode && VALID_PROMO_CODES[currentPromoCode]) {
-                    // Apply promo codes for:
-                    // 1. Multiple complete chapters
-                    // 2. No complete chapters
-                    // 3. Regular selections
-                    // But NOT for single complete chapter
-                    promoDiscount = (total - quantityDiscount) * VALID_PROMO_CODES[currentPromoCode];
-                    promoApplied = true;
-                }
-
-                const finalTotal = total - quantityDiscount - promoDiscount;
-                totalAmountDisplay.textContent = finalTotal.toLocaleString('hy-AM');
-
-                const basePriceDisplay = total;
-                let discountHTML = '<div style="text-align: left; max-width: 500px; margin: 0 auto;">';
-                
-                // Show attention messages for complete chapters
-                if (completeChaptersCount === 1) {
-                    // Single complete chapter
-                    discountHTML += `<div style="color: #3182ce; margin-bottom: 12px; padding: 8px; background: #ebf8ff; border-radius: 6px; border-left: 4px solid #4299e1;">`;
-                    discountHTML += `<strong>💡 Ուշադրությու՜ն:</strong> Դուք ընտրել եք ամբողջական գլուխ:`;
-                    discountHTML += `</div>`;
-                } else if (completeChaptersCount > 1) {
-                    // Multiple complete chapters
-                    discountHTML += `<div style="color: #3182ce; margin-bottom: 12px; padding: 8px; background: #ebf8ff; border-radius: 6px; border-left: 4px solid #4299e1;">`;
-                    discountHTML += `<strong>💡 Ուշադրությու՜ն:</strong> Դուք ընտրել եք ${completeChaptersCount} ամբողջական գլուխ:`;
-                    discountHTML += `</div>`;
-                }
-                
-                discountHTML += `<div style="margin-bottom: 8px;">Սկզբնական գինը՝ <span style="font-weight: 600;">${basePriceDisplay.toLocaleString('hy-AM')} դրամ</span></div>`;
-                
-                if (quantityDiscount > 0) {
-                    discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">${quantityDiscountText}: <span style="font-weight: 600;">-${quantityDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
-                }
-                
-                if (promoApplied && promoDiscount > 0) {
-                    const promoColor = currentPromoCode === 'CHRISTMAS30' ? '#C41E3A' : '#2c7a7b';
-                    const promoLabel = currentPromoCode === 'CHRISTMAS30' ? '30% Սուրբ Ծննդյան զեղչ' : '10% լրացուցիչ զեղչ պրոմո կոդով';
-                    discountHTML += `<div style="color: ${promoColor}; margin-bottom: 8px; font-weight: 600;">${promoLabel}: <span style="font-weight: 700;">-${promoDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
-                } else if (currentPromoCode && isSingleCompleteChapter) {
-                    discountHTML += `<div style="color: #718096; margin-bottom: 8px; font-style: italic;">Պրոմո կոդը չի կիրառվում մեկ ամբողջական գլխի գնման դեպքում</div>`;
-                }
-                
-                const totalDiscount = quantityDiscount + promoDiscount;
-                if (totalDiscount > 0) {
-                    discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; color: #234e52;">`;
-                    discountHTML += `Ընդհանուր խնայողությունը՝ <span style="font-weight: 600;">${totalDiscount.toLocaleString('hy-AM')} դրամ</span>`;
-                    discountHTML += `</div>`;
-                } else if (!isSingleCompleteChapter) {
-                    discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; color: #718096; font-style: italic;">`;
-                    discountHTML += `Խնայողություններ ստանալու համար ընտրեք ավելի շատ դասընթացներ կամ կիրառեք պրոմո կոդ`;
-                    discountHTML += `</div>`;
-                }
-                discountHTML += `</div>`;
-                discountInfo.innerHTML = discountHTML;
+            });
+            
+            // Check if it's a SINGLE complete chapter case
+            if (completeChaptersCount === 1 && coursesToCalculate.length === 0) {
+                // Only one complete chapter and no other courses
+                isSingleCompleteChapter = true;
+                quantityDiscount = 0;
+                quantityDiscountText = '';
             } else {
-                totalAmountDisplay.textContent = '0';
-                if (courseCount > 0) {
-                    discountInfo.innerHTML = 'Ընտրեք առնվազն 2 դասընթաց գինը հաշվելու համար։';
-                } else {
-                    discountInfo.innerHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար։';
+                // For MULTIPLE complete chapters or complete chapter + other courses, apply quantity discounts
+                const effectiveCourseCount = completeChaptersCount + coursesToCalculate.length;
+                
+                if (effectiveCourseCount >= 2 && effectiveCourseCount <= 3) {
+                    discountPercentage = 0.05;
+                    quantityDiscountText = '5% զեղչ 2-3 դասընթացի համար';
+                } else if (effectiveCourseCount >= 4 && effectiveCourseCount <= 6) {
+                    discountPercentage = 0.07;
+                    quantityDiscountText = '7% զեղչ 4-6 դասընթացի համար';
+                } else if (effectiveCourseCount >= 7 && effectiveCourseCount <= 9) {
+                    discountPercentage = 0.10;
+                    quantityDiscountText = '10% զեղչ 7-8 դասընթացի համար';
+                } else if (effectiveCourseCount > 9) {
+                    discountPercentage = 0.12;
+                    quantityDiscountText = '12% զեղչ 9+ դասընթացի համար';
                 }
+                quantityDiscount = total * discountPercentage;
             }
-            courseCountText.textContent = courseCount > 0 
-                ? `Ընտրված է ${courseCount} դասընթաց` 
-                : 'Դեռևս դասընթաց չի ընտրվել';
+        } else {
+            // Regular calculation without complete chapters
+            selectedCourses.forEach(course => {
+                const courseId = course.id;
+                if (courseId.startsWith('course')) {
+                    total += courses[courseId].price || 0;
+                } else {
+                    total += courses[courseId].basePrice || 0;
+                }
+            });
+
+            // Apply quantity discounts as usual
+            if (courseCount >= 2 && courseCount <= 3) {
+                discountPercentage = 0.05;
+                quantityDiscountText = '5% զեղչ 2-3 դասընթացի համար';
+            } else if (courseCount >= 4 && courseCount <= 6) {
+                discountPercentage = 0.07;
+                quantityDiscountText = '7% զեղչ 4-6 դասընթացի համար';
+            } else if (courseCount >= 7 && courseCount <= 9) {
+                discountPercentage = 0.10;
+                quantityDiscountText = '10% զեղչ 7-8 դասընթացի համար';
+            } else if (courseCount > 9) {
+                discountPercentage = 0.12;
+                quantityDiscountText = '12% զեղչ 9+ դասընթացի համար';
+            }
+            quantityDiscount = total * discountPercentage;
         }
+        
+        // Apply promo discount based on conditions
+        let promoDiscount = 0;
+        let promoApplied = false;
+        
+        if (!isSingleCompleteChapter && currentPromoCode && VALID_PROMO_CODES[currentPromoCode]) {
+            promoDiscount = (total - quantityDiscount) * VALID_PROMO_CODES[currentPromoCode];
+            promoApplied = true;
+        }
+
+        const finalTotal = total - quantityDiscount - promoDiscount;
+        totalAmountDisplay.textContent = finalTotal.toLocaleString('hy-AM');
+
+        const basePriceDisplay = total;
+        let discountHTML = '<div style="text-align: left; max-width: 500px; margin: 0 auto;">';
+        
+        // Show attention messages for complete chapters
+        if (completeChaptersCount === 1 && coursesToCalculate.length === 0) {
+            // Single complete chapter only
+            discountHTML += `<div style="color: #3182ce; margin-bottom: 12px; padding: 8px; background: #ebf8ff; border-radius: 6px; border-left: 4px solid #4299e1;">`;
+            discountHTML += `<strong>💡 Ուշադրությու՜ն:</strong> Դուք ընտրել եք ամբողջական գլուխ:`;
+            discountHTML += `</div>`;
+        } else if (completeChaptersCount > 0) {
+            // Multiple complete chapters or complete chapter with other courses
+            discountHTML += `<div style="color: #3182ce; margin-bottom: 12px; padding: 8px; background: #ebf8ff; border-radius: 6px; border-left: 4px solid #4299e1;">`;
+            if (completeChaptersCount === 1) {
+                discountHTML += `<strong>💡 Ուշադրությու՜ն:</strong> Դուք ընտրել եք ամբողջական գլուխ այլ դասընթացների հետ:`;
+            } else {
+                discountHTML += `<strong>💡 Ուշադրությու՜ն:</strong> Դուք ընտրել եք ${completeChaptersCount} ամբողջական գլուխ`;
+                if (coursesToCalculate.length > 0) {
+                    discountHTML += ` այլ դասընթացների հետ`;
+                }
+                discountHTML += `:`;
+            }
+            discountHTML += `</div>`;
+        }
+        
+        discountHTML += `<div style="margin-bottom: 8px;">Սկզբնական գինը՝ <span style="font-weight: 600;">${basePriceDisplay.toLocaleString('hy-AM')} դրամ</span></div>`;
+        
+        if (quantityDiscount > 0) {
+            discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px;">${quantityDiscountText}: <span style="font-weight: 600;">-${quantityDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
+        }
+        
+        if (promoApplied && promoDiscount > 0) {
+            const promoColor = currentPromoCode === 'CHRISTMAS30' ? '#C41E3A' : '#2c7a7b';
+            const promoLabel = currentPromoCode === 'CHRISTMAS30' ? '30% Սուրբ Ծննդյան զեղչ' : '10% լրացուցիչ զեղչ պրոմո կոդով';
+            discountHTML += `<div style="color: ${promoColor}; margin-bottom: 8px; font-weight: 600;">${promoLabel}: <span style="font-weight: 700;">-${promoDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
+        } else if (currentPromoCode && isSingleCompleteChapter) {
+            discountHTML += `<div style="color: #718096; margin-bottom: 8px; font-style: italic;">Պրոմո կոդը չի կիրառվում մեկ ամբողջական գլխի գնման դեպքում</div>`;
+        }
+        
+        const totalDiscount = quantityDiscount + promoDiscount;
+        if (totalDiscount > 0) {
+            discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; color: #234e52;">`;
+            discountHTML += `Ընդհանուր խնայողությունը՝ <span style="font-weight: 600;">${totalDiscount.toLocaleString('hy-AM')} դրամ</span>`;
+            discountHTML += `</div>`;
+        } else if (!isSingleCompleteChapter) {
+            discountHTML += `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #c6f6d5; color: #718096; font-style: italic;">`;
+            discountHTML += `Խնայողություններ ստանալու համար ընտրեք ավելի շատ դասընթացներ կամ կիրառեք պրոմո կոդ`;
+            discountHTML += `</div>`;
+        }
+        discountHTML += `</div>`;
+        discountInfo.innerHTML = discountHTML;
+    } else {
+        totalAmountDisplay.textContent = '0';
+        if (courseCount > 0) {
+            discountInfo.innerHTML = 'Ընտրեք առնվազն 2 դասընթաց գինը հաշվելու համար։';
+        } else {
+            discountInfo.innerHTML = 'Ընտրեք դասընթացներ զեղչերի կիրառման համար։';
+        }
+    }
+    courseCountText.textContent = courseCount > 0 
+        ? `Ընտրված է ${courseCount} դասընթաց` 
+        : 'Դեռևս դասընթաց չի ընտրվել';
+}
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
