@@ -33,49 +33,6 @@
         font-family: Arial, sans-serif;
     }
 
-    /* ===== CHRISTMAS DECORATIONS ===== */
-    /* Holly & berry pattern along top */
-    .course-calculator-page::before {
-        content: "";
-        position: absolute;
-        top: -10px;
-        left: 10px;
-        right: 10px;
-        height: 16px;
-        background-image: 
-            radial-gradient(circle at 50% 40%, #c41e3a 3px, transparent 4px),
-            radial-gradient(circle at 50% 40%, #2e8b57 3px, transparent 4px);
-        background-size: 24px 16px;
-        background-repeat: repeat-x;
-        background-position: 0 0, 12px 0;
-        opacity: 0.85;
-        pointer-events: none;
-        z-index: 2;
-    }
-
-    /* Top-left ornament */
-    .course-calculator-page::after {
-        content: "🎄";
-        position: absolute;
-        top: -10px;
-        left: 0px;
-        font-size: 1.4rem;
-        z-index: 3;
-        opacity: 0.9;
-        pointer-events: none;
-    }
-
-    /* Top-right ornament */
-    .xmas-decor {
-        position: absolute;
-        top: -10px;
-        right: 0px;
-        font-size: 1.4rem;
-        z-index: 3;
-        opacity: 0.9;
-        pointer-events: none;
-    }
-
     /* ===== HEADER ===== */
     .calculator-header {
         text-align: center;
@@ -486,20 +443,6 @@
             border-radius: 14px !important;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
         }
-        .xmas-decor {
-            top: -8px;
-            right: 0px;
-            font-size: 1.2rem;
-        }
-        .course-calculator-page::after {
-            top: -8px;
-            left: 0px;
-            font-size: 1.2rem;
-        }
-        .course-calculator-page::before {
-            top: -10px;
-            height: 14px;
-        }
         .calculator-header h1 {
             font-size: 1.5rem !important;
             line-height: 1.2 !important;
@@ -621,20 +564,6 @@
             margin: 6px auto !important;
             border-radius: 12px !important;
         }
-        .xmas-decor {
-            top: -10px;
-            right: 0px;
-            font-size: 1.1rem;
-        }
-        .course-calculator-page::after {
-            top: -10px;
-            left: 0px;
-            font-size: 1.1rem;
-        }
-        .course-calculator-page::before {
-            top: -10px;
-            height: 12px;
-        }
         .calculator-header h1 {
             font-size: 1.3rem !important;
         }
@@ -695,8 +624,6 @@
 </head>
 <body>
     <section id="course-calculator" class="course-calculator-page">
-        <div class="xmas-decor">🎁</div>
-
         <div class="calculator-header">
             <h1>Դասընթացների փաթեթի արժեքի հաշվիչ</h1>
             <p>Ընտրեք դասընթացները, օգտվեք զեղչերից և հաշվեք ձեր խնայողությունները փաթեթի գնման դեպքում</p>
@@ -1034,8 +961,7 @@
         let selectedCourses = [];
         let currentPromoCode = '';
         const VALID_PROMO_CODES = { 
-            'PROMO10': 0.10,    // 10% discount - MUST BE UPPERCASE
-            'CHRISTMAS30': 0.30 // 30% Christmas discount - MUST BE UPPERCASE
+            'PROMO10': 0.10    // 10% discount - MUST BE UPPERCASE
         };
         const MIN_COURSES_REQUIRED = 2;
 
@@ -1250,16 +1176,6 @@
                 applyPromoButton.textContent = 'Կիրառված է';
                 applyPromoButton.disabled = true;
                 setupPromoResetListener();
-            } else if (promoCode === 'CHRISTMAS30') {
-                currentPromoCode = promoCode;
-                promoCodeInput.style.borderColor = '#C41E3A';
-                promoCodeInput.style.background = '#FFF9F9';
-                promoMessage.style.color = '#C41E3A';
-                promoMessage.innerHTML = '<strong>🎄 Սուրբ Ծննդյան պրոմո կոդը հաստատված է։ </strong> Դուք կստանաք լրացուցիչ 30% զեղչ: 🎁';
-                applyPromoButton.style.background = 'linear-gradient(135deg, #C41E3A 0%, #A5152E 100%)';
-                applyPromoButton.textContent = 'Կիրառված է';
-                applyPromoButton.disabled = true;
-                setupPromoResetListener();
             } else if (promoCode === '') {
                 currentPromoCode = '';
                 promoCodeInput.style.borderColor = '#e2e8f0';
@@ -1277,15 +1193,14 @@
                 
                 // Check if it's a case-sensitive issue
                 const lowerCasePromo = promoCode.toLowerCase();
-                if (lowerCasePromo === 'promo10' || lowerCasePromo === 'christmas30') {
+                if (lowerCasePromo === 'promo10') {
                     promoMessage.innerHTML = '<strong>Սխալ:</strong> Պրոմո կոդը պետք է մուտքագրվի ՄԵԾԱՏԵՌՆԵՐՈՎ: Օրինակ՝ <strong>PROMO10</strong>';
                 } else {
                     promoMessage.textContent = 'Պրոմո կոդը անվավեր է:';
                 }
                 
                 setTimeout(() => {
-                    if (promoCodeInput.value.trim() !== 'PROMO10' && 
-                        promoCodeInput.value.trim() !== 'CHRISTMAS30') {
+                    if (promoCodeInput.value.trim() !== 'PROMO10') {
                         applyPromoButton.style.background = '#4299e1';
                         applyPromoButton.textContent = 'Կիրառել կոդը';
                         applyPromoButton.disabled = false;
@@ -1474,9 +1389,7 @@ function calculateTotal() {
         }
         
         if (promoApplied && promoDiscount > 0) {
-            const promoColor = currentPromoCode === 'CHRISTMAS30' ? '#C41E3A' : '#2c7a7b';
-            const promoLabel = currentPromoCode === 'CHRISTMAS30' ? '30% Սուրբ Ծննդյան զեղչ' : '10% լրացուցիչ զեղչ պրոմո կոդով';
-            discountHTML += `<div style="color: ${promoColor}; margin-bottom: 8px; font-weight: 600;">${promoLabel}: <span style="font-weight: 700;">-${promoDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
+            discountHTML += `<div style="color: #2c7a7b; margin-bottom: 8px; font-weight: 600;">10% լրացուցիչ զեղչ պրոմո կոդով: <span style="font-weight: 700;">-${promoDiscount.toLocaleString('hy-AM')} դրամ</span></div>`;
         } else if (currentPromoCode && isSingleCompleteChapter) {
             discountHTML += `<div style="color: #718096; margin-bottom: 8px; font-style: italic;">Պրոմո կոդը չի կիրառվում մեկ ամբողջական գլխի գնման դեպքում</div>`;
         }
@@ -1512,13 +1425,12 @@ function calculateTotal() {
             updatePromoButton();
             calculateTotal();
             console.log('Dimordi Course Calculator loaded successfully!');
-            console.log('Available promo codes: PROMO10 (10% discount), CHRISTMAS30 (30% Christmas discount)');
-            console.log('Promo codes are CASE-SENSITIVE and must be entered in UPPERCASE');
+            console.log('Available promo code: PROMO10 (10% discount)');
+            console.log('Promo code is CASE-SENSITIVE and must be entered in UPPERCASE');
             console.log('Complete chapter detection is active for chapters with full prices');
-            console.log('Promo codes DO NOT apply to SINGLE complete chapter purchases');
-            console.log('Promo codes DO apply to MULTIPLE complete chapter purchases');
+            console.log('Promo code DOES NOT apply to SINGLE complete chapter purchases');
+            console.log('Promo code DOES apply to MULTIPLE complete chapter purchases');
         });
     </script>
 </body>
 </html>
-
